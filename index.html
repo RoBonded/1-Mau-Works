@@ -855,32 +855,15 @@
       })(t0);
     }
 
-    /* Roblox API — tries multiple CORS proxies in order */
-    const PLACE_ID = '100560553825714';
-
-    async function proxyFetch(url) {
-      // Try a list of proxies — first one that works wins
-      const proxies = [
-        u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-        u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
-        u => `https://thingproxy.freeboard.io/fetch/${u}`,
-      ];
-      for (const makeUrl of proxies) {
-        try {
-          const r = await fetch(makeUrl(url), { signal: AbortSignal.timeout(5000) });
-          if (r.ok) return await r.json();
-        } catch(e) { /* try next */ }
-      }
-      throw new Error('all proxies failed');
-    }
+    /* Roblox API — universe ID hardcoded, calls games API directly (no proxy needed) */
+    const UNIVERSE_ID = '9544855325';
 
     async function fetchStats() {
       const ALL_IDS = ['h-visits','h-playing','h-favs','s-visits','s-playing','s-favs','a-visits','a-playing','a-favs'];
       try {
-        const uid = (await proxyFetch(`https://apis.roblox.com/universes/v1/places/${PLACE_ID}/universe`)).universeId;
-        if (!uid) throw new Error('no uid');
-
-        const g = (await proxyFetch(`https://games.roblox.com/v1/games?universeIds=${uid}`)).data?.[0];
+        const res = await fetch(`https://games.roblox.com/v1/games?universeIds=${UNIVERSE_ID}`);
+        if (!res.ok) throw new Error('api ' + res.status);
+        const g = (await res.json()).data?.[0];
         if (!g) throw new Error('no game data');
 
         const visits  = g.visits         || 0;
