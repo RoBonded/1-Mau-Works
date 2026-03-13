@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>1 MAU Works — Roblox Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+
+    /* ── TOKENS ── */
+    :root {
+      --bg:      #04040a;
+      --card:    #0b0b16;
+      --card2:   #101020;
+      --border:  rgba(255,255,255,.06);
+      --accent:  #63b3ed;
+      --purple:  #7289da;
+      --warm:    #f6ad55;
+      --green:   #68d391;
+      --text:    #edf2f7;
+      --muted:   #6b7a96;
+      --ease:    cubic-bezier(.22,1,.36,1);
+    }
+
+    /* ── RESET ── */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: 'Outfit', sans-serif; font-weight: 300;
+      line-height: 1.7; overflow-x: hidden;
+    }
+
+    /* ── FIXED GRID ── */
+    .bg-fixed { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    .bg-grid {
+      position:absolute; inset:0;
+      background-image:
+        linear-gradient(rgba(99,179,237,.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99,179,237,.028) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse 100% 100% at 50% 0%, black 20%, transparent 80%);
+    }
+
+    /* ── SCROLL BAR ── */
+    #bar {
+      position:fixed; top:0; left:0; height:2px; width:0%;
+      background:linear-gradient(90deg, var(--accent), var(--warm));
+      z-index:999; transition:width .1s linear;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position:fixed; top:0; left:0; right:0; z-index:100;
+      background:rgba(4,4,10,.88); backdrop-filter:blur(28px);
+      -webkit-backdrop-filter:blur(28px); border-bottom:1px solid var(--border);
+    }
+    .nav-inner {
+      max-width:1120px; margin:0 auto; padding:0 2rem;
+      display:flex; align-items:center; height:64px; gap:1.5rem;
+    }
+    .nav-logo {
+      font-family:'Bebas Neue',sans-serif; font-size:1.4rem; letter-spacing:.07em;
+      color:var(--text); text-decoration:none; flex-shrink:0;
+      display:flex; align-items:center; gap:.55rem;
+    }
+    .nav-logo img { width:26px; height:26px; border-radius:6px; object-fit:cover; }
+    .nav-logo b { color:var(--accent); font-weight:400; }
+
+    .nav-links { display:flex; align-items:center; gap:.05rem; list-style:none; margin-left:auto; }
+    .nav-links a {
+      font-size:.81rem; font-weight:500; letter-spacing:.02em;
+      color:var(--muted); text-decoration:none;
+      padding:.4rem .78rem; border-radius:7px;
+      transition:color .2s, background .2s; position:relative;
+    }
+    .nav-links a:hover  { color:var(--text); background:rgba(255,255,255,.04); }
+    .nav-links a.active { color:var(--accent); }
+    .nav-links a.active::after {
+      content:''; position:absolute; bottom:-1px; left:50%; transform:translateX(-50%);
+      width:12px; height:2px; background:var(--accent); border-radius:2px;
+    }
+    .nav-cta {
+      font-size:.81rem; font-weight:600; color:var(--bg); background:var(--accent);
+      text-decoration:none; padding:.42rem 1.1rem; border-radius:7px; flex-shrink:0;
+      transition:all .22s var(--ease);
+    }
+    .nav-cta:hover { background:#90cdf4; transform:translateY(-1px); box-shadow:0 4px 20px rgba(99,179,237,.35); }
+
+    .hamburger {
+      display:none; flex-direction:column; justify-content:center; gap:5px;
+      background:none; border:none; cursor:pointer; padding:.5rem;
+      margin-left:auto; z-index:101; position:relative; width:36px; height:36px;
+    }
+    .hamburger span {
+      display:block; width:22px; height:2px;
+      background:var(--text); border-radius:2px;
+      transition:transform .35s cubic-bezier(.22,1,.36,1), opacity .25s, width .3s;
+      transform-origin:center;
+    }
+    /* X state */
+    .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity:0; width:0; }
+    .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
+
+    /* ── MOBILE MENU ── */
+    .mob {
+      position:fixed;
+      top:72px;
+      left:12px;
+      right:12px;
+      z-index:99;
+      background:rgba(8,8,20,.92);
+      backdrop-filter:blur(28px) saturate(160%);
+      -webkit-backdrop-filter:blur(28px) saturate(160%);
+      border:1px solid rgba(255,255,255,.09);
+      border-radius:20px;
+      display:flex;
+      flex-direction:column;
+      padding:.5rem;
+      pointer-events:none;
+      opacity:0;
+      transform:translateY(-8px) scale(.97);
+      transform-origin:top center;
+      transition:opacity .28s cubic-bezier(.22,1,.36,1), transform .28s cubic-bezier(.22,1,.36,1);
+      box-shadow:0 20px 60px rgba(0,0,0,.6);
+    }
+    .mob.open { opacity:1; transform:translateY(0) scale(1); pointer-events:all; }
+    .mob a {
+      font-family:'Outfit',sans-serif; font-size:.95rem; font-weight:500;
+      color:rgba(255,255,255,.8); text-decoration:none;
+      padding:.62rem 1.1rem; border-radius:12px;
+      display:flex; align-items:center; width:100%; box-sizing:border-box;
+      opacity:0; transform:translateY(6px);
+      transition:opacity .25s var(--ease), transform .25s var(--ease), background .18s, color .18s;
+    }
+    .mob.open a:nth-child(1) { opacity:1; transform:none; transition-delay:.03s; }
+    .mob.open a:nth-child(2) { opacity:1; transform:none; transition-delay:.08s; }
+    .mob.open a:nth-child(3) { opacity:1; transform:none; transition-delay:.13s; }
+    .mob.open a:nth-child(4) { opacity:1; transform:none; transition-delay:.18s; }
+    .mob.open a:nth-child(5) { opacity:1; transform:none; transition-delay:.23s; }
+    .mob a:first-child { background:rgba(99,179,237,.12); color:var(--accent); }
+    .mob a:hover { background:rgba(255,255,255,.05); color:#fff; }
+    .mob-line { display:none; }
+
+    /* ── LAYOUT ── */
+    .wrap { max-width:1120px; margin:0 auto; padding:0 2rem; position:relative; z-index:1; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp    { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn    { from{opacity:0} to{opacity:1} }
+    @keyframes pulse     { 0%,100%{box-shadow:0 0 0 0 rgba(104,211,145,.55)} 50%{box-shadow:0 0 0 8px rgba(104,211,145,0)} }
+    @keyframes spin      { to{transform:rotate(360deg)} }
+    @keyframes shimmer   { 0%{background-position:-600px 0} 100%{background-position:600px 0} }
+    @keyframes orbFloat  { 0%,100%{transform:translateY(0) scale(1)} 50%{transform:translateY(-28px) scale(1.04)} }
+    @keyframes glowPulse { 0%,100%{opacity:.55} 50%{opacity:1} }
+
+    .reveal { opacity:0; transform:translateY(26px); transition:opacity .75s var(--ease), transform .75s var(--ease); }
+    .reveal.on { opacity:1; transform:translateY(0); }
+    .d1{transition-delay:.07s} .d2{transition-delay:.15s}
+    .d3{transition-delay:.23s} .d4{transition-delay:.31s}
+
+    /* Cards need 3D context on parent */
+    .hero-right, .games-right, .about-right, .acq-grid, .contact-grid { perspective: 900px; }
+    .card { transform-style: preserve-3d; }
+
+    /* Section in-view glow intensifies */
+    .sec.in-view::before { animation: glowPulse 3s ease-in-out infinite; }
+
+    /* ── SECTION WRAPPER with radial glow top ── */
+    .sec {
+      position:relative; overflow:hidden; padding:7.5rem 0;
+      border-top:1px solid var(--border);
+    }
+    .sec::before {
+      content:''; position:absolute; inset:0; pointer-events:none;
+      transition:opacity .3s;
+    }
+
+    /* colour variants */
+    .sec-blue {
+      background:linear-gradient(170deg, rgba(99,179,237,.07) 0%, transparent 50%);
+    }
+    .sec-blue::before {
+      background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,179,237,.13), transparent 65%);
+    }
+    .sec-purple {
+      background:linear-gradient(170deg, rgba(88,101,242,.08) 0%, transparent 50%);
+    }
+    .sec-purple::before {
+      background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(88,101,242,.14), transparent 65%);
+    }
+    .sec-warm {
+      background:linear-gradient(170deg, rgba(246,173,85,.06) 0%, transparent 50%);
+    }
+    .sec-warm::before {
+      background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(246,173,85,.1), transparent 65%);
+    }
+    .sec-green {
+      background:linear-gradient(170deg, rgba(104,211,145,.05) 0%, transparent 50%);
+    }
+    .sec-green::before {
+      background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(104,211,145,.1), transparent 65%);
+    }
+
+    /* ── SHARED CARD SYSTEM ── */
+    .card {
+      position:relative; overflow:hidden;
+      background:var(--card); border-radius:20px;
+      border:1px solid var(--border);
+      transition:transform .35s var(--ease), box-shadow .35s, border-color .3s;
+    }
+    .card::before {
+      content:''; position:absolute; inset:0; pointer-events:none; opacity:0;
+      transition:opacity .35s;
+    }
+    .card:hover { transform:translateY(-6px); }
+    .card:hover::before { opacity:1; }
+
+    .card-blue  { border-color:rgba(99,179,237,.14);  background:linear-gradient(160deg,rgba(99,179,237,.07),var(--card) 55%); }
+    .card-blue::before  { background:radial-gradient(ellipse at 50% 0%,rgba(99,179,237,.16),transparent 65%); }
+    .card-blue:hover  { border-color:rgba(99,179,237,.42);  box-shadow:0 28px 64px rgba(99,179,237,.14); }
+
+    .card-purple{ border-color:rgba(88,101,242,.14);  background:linear-gradient(160deg,rgba(88,101,242,.08),var(--card) 55%); }
+    .card-purple::before{ background:radial-gradient(ellipse at 50% 0%,rgba(88,101,242,.17),transparent 65%); }
+    .card-purple:hover{ border-color:rgba(88,101,242,.44);  box-shadow:0 28px 64px rgba(88,101,242,.17); }
+
+    .card-warm  { border-color:rgba(246,173,85,.12);  background:linear-gradient(160deg,rgba(246,173,85,.06),var(--card) 55%); }
+    .card-warm::before  { background:radial-gradient(ellipse at 50% 0%,rgba(246,173,85,.12),transparent 65%); }
+    .card-warm:hover  { border-color:rgba(246,173,85,.36);  box-shadow:0 28px 64px rgba(246,173,85,.11); }
+
+    .card-green { border-color:rgba(104,211,145,.11);  background:linear-gradient(160deg,rgba(104,211,145,.05),var(--card) 55%); }
+    .card-green::before { background:radial-gradient(ellipse at 50% 0%,rgba(104,211,145,.1),transparent 65%); }
+    .card-green:hover { border-color:rgba(104,211,145,.34);  box-shadow:0 28px 64px rgba(104,211,145,.1); }
+
+    /* ── TYPE LABEL ── */
+    .lbl {
+      display:inline-block;
+      font-size:.63rem; font-weight:700; letter-spacing:.2em; text-transform:uppercase; margin-bottom:.5rem;
+    }
+    .lbl-blue   { color:var(--accent); }
+    .lbl-purple { color:var(--purple); }
+    .lbl-warm   { color:var(--warm); }
+    .lbl-green  { color:var(--green); }
+
+    /* ── CTA ARROW ── */
+    .cta {
+      text-decoration:none;
+      display:inline-flex; align-items:center; gap:.45rem;
+      font-size:.8rem; font-weight:600; letter-spacing:.06em;
+      transition:gap .25s var(--ease);
+    }
+    .cta:hover { gap:.72rem; }
+    .cta-blue   { color:var(--accent); }
+    .cta-purple { color:var(--purple); }
+    .cta-warm   { color:var(--warm); }
+    .cta-green  { color:var(--green); }
+
+    /* ── SECTION HEADER ── */
+    .sh { margin-bottom:3.5rem; }
+    .sh.center { text-align:center; }
+    .sh.center .sub { margin:0 auto; }
+    .sh.split { display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:1.5rem; }
+    .eye {
+      font-size:.66rem; font-weight:700; letter-spacing:.22em; text-transform:uppercase;
+      color:var(--accent); margin-bottom:.65rem;
+    }
+    .h2 {
+      font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(2.2rem,5vw,3.5rem); letter-spacing:.04em; line-height:1; margin-bottom:.75rem;
+    }
+    .sub { color:var(--muted); font-size:.93rem; line-height:1.85; max-width:520px; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display:inline-flex; align-items:center; gap:.5rem;
+      font-family:'Outfit',sans-serif; font-size:.85rem; font-weight:600;
+      letter-spacing:.04em; text-decoration:none; border-radius:9px;
+      padding:.76rem 1.65rem; border:none; cursor:pointer;
+      transition:all .28s var(--ease);
+    }
+    .btn-blue { color:var(--bg); background:var(--accent); }
+    .btn-blue:hover { background:#90cdf4; transform:translateY(-3px); box-shadow:0 12px 32px rgba(99,179,237,.32); }
+    .btn-out  { color:var(--text); background:transparent; border:1px solid rgba(99,179,237,.25); }
+    .btn-out:hover  { background:rgba(99,179,237,.08); border-color:rgba(99,179,237,.5); transform:translateY(-3px); }
+    .btn-sm   { padding:.48rem 1.05rem; font-size:.79rem; }
+
+    /* ── DIVIDER ── */
+    .div { border:none; border-top:1px solid var(--border); }
+
+    /* ══════════════════════════════════════════
+       HERO
+    ══════════════════════════════════════════ */
+    #home {
+      position:relative; overflow:hidden;
+      min-height:100vh; display:flex; align-items:center;
+      padding:130px 0 80px;
+      background:linear-gradient(160deg, rgba(99,179,237,.08) 0%, transparent 45%, rgba(88,101,242,.05) 100%);
+    }
+    #home::before {
+      content:''; position:absolute; inset:0; pointer-events:none;
+      background:radial-gradient(ellipse 85% 65% at 50% 0%, rgba(99,179,237,.14), transparent 65%);
+    }
+    #home::after {
+      content:''; position:absolute; border-radius:50%; pointer-events:none;
+      width:700px; height:700px; bottom:-250px; right:-180px;
+      background:radial-gradient(circle, rgba(88,101,242,.07), transparent 65%);
+    }
+
+    .hero-grid { display:grid; grid-template-columns:1fr 1fr; gap:5rem; align-items:center; width:100%; }
+
+    .hero-tag {
+      display:inline-flex; align-items:center; gap:.5rem;
+      font-size:.68rem; font-weight:700; letter-spacing:.18em; text-transform:uppercase;
+      color:var(--accent); background:rgba(99,179,237,.09); border:1px solid rgba(99,179,237,.22);
+      padding:.34rem .95rem; border-radius:100px; margin-bottom:1.6rem;
+      animation:fadeUp .6s .05s var(--ease) both;
+    }
+    .live-dot { width:6px; height:6px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; }
+
+    .hero-h1 {
+      font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(3.8rem,8vw,7.2rem); line-height:.9; letter-spacing:.04em; margin-bottom:1.6rem;
+      animation:fadeUp .7s .15s var(--ease) both;
+    }
+    .hero-h1 em { color:var(--accent); font-style:normal; }
+
+    .hero-p {
+      font-size:1rem; color:var(--muted); line-height:1.88; max-width:440px; margin-bottom:2.8rem;
+      animation:fadeUp .7s .25s var(--ease) both;
+    }
+    .hero-p strong { color:var(--text); font-weight:500; }
+
+    .hero-actions { display:flex; gap:1rem; flex-wrap:wrap; animation:fadeUp .7s .35s var(--ease) both; }
+
+    /* Hero card */
+    .hero-card { animation:fadeUp .8s .42s var(--ease) both; padding:2rem; }
+    .hc-lbl {
+      font-size:.63rem; font-weight:700; letter-spacing:.18em; text-transform:uppercase;
+      color:var(--muted); margin-bottom:1.3rem; display:flex; align-items:center; gap:.5rem;
+    }
+    .hc-lbl::after { content:''; flex:1; height:1px; background:var(--border); }
+
+    .stat-2x2 {
+      display:grid; grid-template-columns:1fr 1fr;
+      gap:1px; background:var(--border); border-radius:12px; overflow:hidden; margin-bottom:1.4rem;
+    }
+    .s2 { background:var(--card2); padding:1.2rem 1rem; text-align:center; transition:background .25s; }
+    .s2:hover { background:#141428; }
+    .s2-n { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:.04em; line-height:1; color:var(--accent); margin-bottom:.22rem; }
+    .s2-l { font-size:.6rem; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; }
+
+    .group-pill {
+      display:flex; align-items:center; gap:.75rem; padding:.85rem 1.1rem; border-radius:10px;
+      background:rgba(99,179,237,.05); border:1px solid rgba(99,179,237,.13);
+      text-decoration:none; color:var(--text); font-size:.83rem; font-weight:500;
+      transition:all .25s var(--ease);
+    }
+    .group-pill:hover { background:rgba(99,179,237,.1); border-color:rgba(99,179,237,.3); transform:translateX(3px); }
+    .group-pill img { width:24px; height:24px; border-radius:5px; object-fit:cover; }
+    .gpa { margin-left:auto; color:var(--accent); }
+
+    /* ══════════════════════════════════════════
+       GAMES
+    ══════════════════════════════════════════ */
+    .game-layout { display:grid; grid-template-columns:1.35fr 1fr; gap:1.4rem; align-items:start; }
+
+    .game-thumb {
+      position:relative; width:100%; overflow:hidden;
+      background:var(--card2); border-radius:18px 18px 0 0;
+    }
+    .game-thumb img { width:100%; height:auto; display:block; object-fit:contain; transition:transform .6s var(--ease); }
+    .card:hover .game-thumb img { transform:scale(1.03); }
+    .game-thumb-overlay {
+      position:absolute; inset:0;
+      background:linear-gradient(to bottom, transparent 40%, rgba(11,11,22,.98) 100%);
+    }
+    .shimmer {
+      background:linear-gradient(90deg, var(--card2) 25%, rgba(255,255,255,.035) 50%, var(--card2) 75%);
+      background-size:800px 100%; animation:shimmer 1.5s infinite;
+    }
+    .thumb-load { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+    .spinner { width:26px; height:26px; border:2px solid rgba(99,179,237,.18); border-top-color:var(--accent); border-radius:50%; animation:spin .75s linear infinite; }
+
+    .thumb-badges { position:absolute; top:1rem; left:1rem; right:1rem; display:flex; justify-content:flex-end; align-items:center; }
+    .badge-l { display:flex; align-items:center; gap:.5rem; font-size:.75rem; font-weight:700; letter-spacing:.06em; color:#fff; background:rgba(104,211,145,.18); border:1.5px solid rgba(104,211,145,.55); padding:.35rem 1rem; border-radius:100px; backdrop-filter:blur(8px); box-shadow:0 0 16px rgba(104,211,145,.25); }
+    .badge-ld { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 8px rgba(104,211,145,.9); animation:pulse 1.6s infinite; }
+
+    .game-body { padding:1.6rem; }
+    .game-title { font-family:'Bebas Neue',sans-serif; font-size:1.7rem; letter-spacing:.04em; margin-bottom:.3rem; }
+    .game-by { font-size:.74rem; color:var(--muted); margin-bottom:.8rem; }
+    .game-by em { color:var(--accent); font-style:normal; font-weight:500; }
+    .game-desc { font-size:.84rem; color:var(--muted); line-height:1.75; margin-bottom:1.3rem; }
+
+    .stat-row { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border-radius:10px; overflow:hidden; margin-bottom:1.3rem; }
+    .sr { background:var(--card2); padding:.85rem .5rem; text-align:center; }
+    .sr-n { font-family:'Bebas Neue',sans-serif; font-size:1.1rem; letter-spacing:.04em; color:var(--accent); line-height:1; margin-bottom:.18rem; }
+    .sr-l { font-size:.58rem; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; }
+
+    .play-btn {
+      display:flex; align-items:center; justify-content:center; gap:.65rem;
+      width:100%; padding:.88rem; border-radius:9px;
+      background:var(--accent); color:var(--bg);
+      font-size:.86rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase;
+      text-decoration:none; transition:all .28s var(--ease);
+    }
+    .play-btn:hover { background:#90cdf4; transform:translateY(-2px); box-shadow:0 10px 30px rgba(99,179,237,.32); }
+    .play-icon { width:0; height:0; border-top:5px solid transparent; border-bottom:5px solid transparent; border-left:9px solid var(--bg); }
+
+    .game-side { display:flex; flex-direction:column; gap:1.4rem; }
+    .cs-card { padding:2.2rem 1.9rem; display:flex; flex-direction:column; gap:.75rem; }
+
+    /* ══════════════════════════════════════════
+       ABOUT
+    ══════════════════════════════════════════ */
+    .about-layout { display:grid; grid-template-columns:1fr 1fr; gap:5.5rem; align-items:start; }
+
+    .feat-list { display:grid; gap:.85rem; margin-top:2.2rem; }
+    .feat { display:flex; align-items:flex-start; gap:1rem; padding:1.3rem 1.5rem; }
+    .feat-num {
+      flex-shrink:0; width:34px; height:34px; display:flex; align-items:center; justify-content:center;
+      font-family:'Bebas Neue',sans-serif; font-size:.82rem; letter-spacing:.04em;
+      border-radius:8px; transition:transform .3s;
+    }
+    .card-blue  .feat-num { color:var(--accent);  background:rgba(99,179,237,.12); }
+    .card-purple .feat-num { color:var(--purple); background:rgba(88,101,242,.12); }
+    .card-warm  .feat-num { color:var(--warm);   background:rgba(246,173,85,.1); }
+    .feat:hover .feat-num { transform:rotate(8deg) scale(1.1); }
+    .feat-t { font-weight:600; font-size:.9rem; margin-bottom:.2rem; }
+    .feat-d { font-size:.82rem; color:var(--muted); line-height:1.65; }
+
+    .about-stats { display:flex; flex-direction:column; gap:1rem; }
+    .big-stat { padding:1.8rem 2rem; }
+    .bs-n {
+      font-family:'Bebas Neue',sans-serif; font-size:3.6rem; letter-spacing:.02em; line-height:1;
+      background:linear-gradient(130deg, var(--accent), var(--warm));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+      margin-bottom:.28rem;
+    }
+    .bs-l { font-size:.68rem; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; }
+    .bs-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+
+    /* ══════════════════════════════════════════
+       ACQUISITIONS
+    ══════════════════════════════════════════ */
+    .acq-intro { display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:center; margin-bottom:3.5rem; }
+    .acq-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem; }
+    .acq-card { padding:2.2rem 1.9rem; display:flex; flex-direction:column; gap:.6rem; }
+    .acq-num { font-family:'Bebas Neue',sans-serif; font-size:2.6rem; letter-spacing:.04em; line-height:1; opacity:.12; margin-bottom:.4rem; }
+    .acq-t { font-family:'Bebas Neue',sans-serif; font-size:1.15rem; letter-spacing:.04em; }
+    .acq-d { font-size:.82rem; color:var(--muted); line-height:1.7; flex:1; }
+
+    .acq-cta {
+      margin-top:2.5rem; padding:3rem 2.5rem; text-align:center;
+    }
+    .acq-cta h3 { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:.04em; margin-bottom:.65rem; }
+    .acq-cta p { color:var(--muted); font-size:.92rem; max-width:420px; margin:0 auto 2rem; line-height:1.8; }
+
+    /* ══════════════════════════════════════════
+       CONTACT
+    ══════════════════════════════════════════ */
+    .contact-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.4rem; max-width:1100px; margin:0 auto; }
+    .ccard { padding:2.5rem 2.1rem; display:flex; flex-direction:column; gap:1.2rem; text-decoration:none; color:var(--text); }
+    .ccard-icon { width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .ccard-purple .ccard-icon { background:linear-gradient(135deg,#5865F2,#7289da); }
+    .ccard-blue   .ccard-icon { background:linear-gradient(135deg,#4a7cdc,var(--accent)); }
+    .ccard-dark:hover { border-color:rgba(255,255,255,.25) !important; box-shadow:0 24px 60px rgba(0,0,0,.5); transform:translateY(-6px); }
+    .ccard-x:hover { border-color:rgba(255,255,255,.3) !important; box-shadow:0 24px 60px rgba(255,255,255,.08); transform:translateY(-6px); }
+    .ccard-t { font-family:'Bebas Neue',sans-serif; font-size:1.5rem; letter-spacing:.04em; line-height:1.1; margin-bottom:.35rem; }
+    .ccard-d { font-size:.83rem; color:var(--muted); line-height:1.7; flex:1; }
+
+    /* ── FOOTER ── */
+    footer { padding:2.2rem 0; border-top:1px solid var(--border); }
+    .foot { max-width:1120px; margin:0 auto; padding:0 2rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+    .foot-logo { font-family:'Bebas Neue',sans-serif; font-size:1.2rem; letter-spacing:.07em; display:flex; align-items:center; gap:.5rem; }
+    .foot-logo img { width:20px; height:20px; border-radius:5px; }
+    .foot-logo b { color:var(--accent); font-weight:400; }
+    .foot-copy { font-size:.74rem; color:var(--muted); }
+    .foot-links { display:flex; gap:1.2rem; }
+    .foot-links a { font-size:.74rem; color:var(--muted); text-decoration:none; transition:color .2s; }
+    .foot-links a:hover { color:var(--text); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width:940px) {
+      .hero-grid    { grid-template-columns:1fr; }
+      .hero-card    { display:none; }
+      .about-layout { grid-template-columns:1fr; gap:3rem; }
+      .game-layout  { grid-template-columns:1fr; }
+      .acq-intro    { grid-template-columns:1fr; gap:2rem; }
+      .acq-grid     { grid-template-columns:1fr; }
+      .contact-grid { grid-template-columns:1fr; }
+      .nav-links, .nav-cta { display:none; }
+      .hamburger { display:flex; }
+    }
+    @media (max-width:500px) {
+      .bs-row   { grid-template-columns:1fr; }
+      .stat-row { grid-template-columns:repeat(3,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="bar"></div>
+  <div class="bg-fixed" aria-hidden="true"><div class="bg-grid"></div></div>
+
+  <div class="mob" id="mob">
+    <a href="#home"         onclick="closeMob()">Home</a>
+    <a href="#games"        onclick="closeMob()">Our Games</a>
+    <a href="#about"        onclick="closeMob()">About</a>
+    <a href="#acquisitions" onclick="closeMob()">Acquisitions</a>
+    <a href="#contact"      onclick="closeMob()">Contact</a>
+  </div>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="#home" class="nav-logo">
+        <img src="https://tr.rbxcdn.com/180DAY-08ad183fd368168dd876996dad8014a8/150/150/Image/Webp/noFilter" alt="logo" />
+        1 MAU <b>Works</b>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#home" class="active">Home</a></li>
+        <li><a href="#games">Our Games</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#acquisitions">Acquisitions</a></li>
+      </ul>
+      <a href="#contact" class="nav-cta">Contact Us</a>
+      <button class="hamburger" id="burger" onclick="toggleMob()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ══════════════ HERO ══════════════ -->
+  <section id="home">
+    <div class="wrap">
+      <div class="hero-grid">
+
+        <div>
+          <div class="hero-tag"><span class="live-dot"></span>Roblox Game Studio</div>
+          <h1 class="hero-h1">1 MAU<br/><em>Works</em></h1>
+          <p class="hero-p">
+            We build <strong>Roblox experiences</strong> that grow. Fast to ship,
+            designed to retain, and built to scale — with more titles in development for 2026.
+          </p>
+          <div class="hero-actions">
+            <a href="#games"   class="btn btn-blue">View Our Games</a>
+            <a href="#contact" class="btn btn-out">Get In Touch</a>
+          </div>
+        </div>
+
+        <div class="card card-blue hero-card">
+          <div class="hc-lbl">Studio at a Glance</div>
+          <div class="stat-2x2">
+            <div class="s2"><div class="s2-n" id="h-visits">—</div><div class="s2-l">Total Visits</div></div>
+            <div class="s2"><div class="s2-n" id="h-playing">—</div><div class="s2-l">Playing Now</div></div>
+            <div class="s2"><div class="s2-n" id="h-favs">—</div><div class="s2-l">Favorites</div></div>
+            <div class="s2"><div class="s2-n">1+</div><div class="s2-l">Games Live</div></div>
+          </div>
+          <a href="https://www.roblox.com/communities/33951057/1-MAU-Works" target="_blank" rel="noopener" class="group-pill">
+            <img src="https://tr.rbxcdn.com/180DAY-08ad183fd368168dd876996dad8014a8/150/150/Image/Webp/noFilter" alt="1 MAU Works" />
+            <span>Roblox Group — 1 MAU Works</span>
+            <span class="gpa">→</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ GAMES ══════════════ -->
+  <section id="games" class="sec sec-blue">
+    <div class="wrap">
+      <div class="sh split">
+        <div>
+          <div class="eye reveal">Our Games</div>
+          <h2 class="h2 reveal d1">What We've Built</h2>
+          <p class="sub reveal d2">Live experiences with real-time stats — more titles currently in development.</p>
+        </div>
+        <a href="https://www.roblox.com/communities/33951057/1-MAU-Works#!/about" target="_blank" rel="noopener" class="btn btn-out btn-sm reveal">View on Roblox</a>
+      </div>
+
+      <div class="game-layout reveal">
+
+        <div class="card card-blue" style="padding:0;">
+          <div class="game-thumb" id="gameThumb">
+            <img src="https://tr.rbxcdn.com/180DAY-7f2f8c37511a5edc3ac366661dccdf00/768/432/Image/Webp/noFilter" alt="Find a Car"/>
+            <div class="game-thumb-overlay"></div>
+            <div class="thumb-badges">
+              <span class="badge-l"><span class="badge-ld"></span>Live</span>
+            </div>
+          </div>
+          <div class="game-body">
+            <div class="lbl lbl-blue">1 MAU Works</div>
+            <div class="game-title">Find a Car</div>
+            <div class="game-desc">Hunt down hidden vehicles scattered across the map. A fast-paced discovery game that keeps players coming back for more.</div>
+            <div class="stat-row">
+              <div class="sr"><div class="sr-n" id="s-visits"><div class="spinner" style="width:11px;height:11px;margin:auto;"></div></div><div class="sr-l">Visits</div></div>
+              <div class="sr"><div class="sr-n" id="s-playing"><div class="spinner" style="width:11px;height:11px;margin:auto;"></div></div><div class="sr-l">Playing</div></div>
+              <div class="sr"><div class="sr-n" id="s-favs"><div class="spinner" style="width:11px;height:11px;margin:auto;"></div></div><div class="sr-l">Favorites</div></div>
+            </div>
+            <a href="https://www.roblox.com/games/100560553825714/Find-a-Car" target="_blank" rel="noopener" class="play-btn">
+              <span class="play-icon"></span>Play Now on Roblox
+            </a>
+          </div>
+        </div>
+
+        <div class="game-side">
+          <div class="card card-warm cs-card reveal d2">
+            <span class="lbl lbl-warm">In Development</span>
+            <div class="h2" style="font-size:1.6rem;">Next Game In The Works</div>
+            <div class="sub" style="font-size:.83rem;">We're actively building our next Roblox experience. Follow our group to be first to know when it launches.</div>
+            <a href="https://www.roblox.com/communities/33951057/1-MAU-Works" target="_blank" rel="noopener" class="cta cta-warm">Stay tuned <span>→</span></a>
+          </div>
+          <div class="card card-purple cs-card reveal d3">
+            <span class="lbl lbl-purple">Coming Soon</span>
+            <div class="h2" style="font-size:1.6rem;">More on the Way</div>
+            <div class="sub" style="font-size:.83rem;">New games, new genres, bigger experiences — in the pipeline for 2026.</div>
+            <a href="https://discord.gg/jwdkxcsDUt" target="_blank" rel="noopener" class="cta cta-purple">More in 2026 <span>→</span></a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ ABOUT ══════════════ -->
+  <section id="about" class="sec sec-purple">
+    <div class="wrap">
+      <div class="about-layout">
+
+        <div>
+          <div class="eye reveal">About Us</div>
+          <h2 class="h2 reveal d1">Built to<br/>Go Big</h2>
+          <p class="sub reveal d2">
+            1 MAU Works is a Roblox studio founded by <strong style="color:var(--text);font-weight:500;">Lil10K</strong>.
+            We build experiences that are fun, sticky, and scalable — games players discover, share, and return to.
+          </p>
+          <div class="feat-list">
+            <div class="card card-blue feat reveal d1">
+              <div class="feat-num">01</div>
+              <div>
+                <div class="feat-t">Player-First Design</div>
+                <div class="feat-d">Every mechanic is built around what keeps players engaged and entertained for the long run.</div>
+              </div>
+            </div>
+            <div class="card card-purple feat reveal d2">
+              <div class="feat-num">02</div>
+              <div>
+                <div class="feat-t">Growth From Day One</div>
+                <div class="feat-d">We think about discovery, virality, and retention before a single line of code is written.</div>
+              </div>
+            </div>
+            <div class="card card-warm feat reveal d3">
+              <div class="feat-num">03</div>
+              <div>
+                <div class="feat-t">Fast Iteration</div>
+                <div class="feat-d">Rapid cycles and data-driven updates keep our games competitive and always evolving.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-stats reveal">
+          <div class="card card-blue big-stat">
+            <div class="bs-n" id="a-visits">—</div>
+            <div class="bs-l">Total Game Visits</div>
+          </div>
+          <div class="bs-row">
+            <div class="card card-purple big-stat">
+              <div class="bs-n" id="a-playing">—</div>
+              <div class="bs-l">Playing Now</div>
+            </div>
+            <div class="card card-warm big-stat">
+              <div class="bs-n" id="a-favs">—</div>
+              <div class="bs-l">Favorites</div>
+            </div>
+          </div>
+          <a href="https://discord.com/users/reallil10k" target="_blank" rel="noopener" class="card card-green big-stat" style="text-decoration:none;color:inherit;">
+            <div class="bs-n" style="font-size:2.2rem;">Lil10K</div>
+            <div class="bs-l">Founder — 1 MAU Works Studio</div>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ ACQUISITIONS ══════════════ -->
+  <section id="acquisitions" class="sec sec-warm">
+    <div class="wrap">
+      <div class="acq-intro">
+        <div>
+          <div class="eye reveal">Game Acquisitions</div>
+          <h2 class="h2 reveal d1">Ready to Exit<br/>Your Game?</h2>
+        </div>
+        <p class="sub reveal">
+          We acquire Roblox games with strong potential and take them further.
+          If you've built something worth scaling, let's talk.
+        </p>
+      </div>
+
+      <div class="acq-grid">
+        <div class="card card-blue acq-card reveal d1">
+          <div class="acq-num">01</div>
+          <span class="lbl lbl-blue">Acquisition</span>
+          <div class="acq-t">Full Purchase</div>
+          <div class="acq-d">We purchase your game outright with a competitive upfront payment for your work and IP.</div>
+          <a href="https://discord.gg/jwdkxcsDUt" target="_blank" rel="noopener" class="cta cta-blue">Learn more <span>→</span></a>
+        </div>
+        <div class="card card-purple acq-card reveal d2">
+          <div class="acq-num">02</div>
+          <span class="lbl lbl-purple">Development</span>
+          <div class="acq-t">Expert Team</div>
+          <div class="acq-d">Our team handles ongoing development, updates, marketing, and monetization optimization.</div>
+          <a href="https://discord.gg/jwdkxcsDUt" target="_blank" rel="noopener" class="cta cta-purple">Learn more <span>→</span></a>
+        </div>
+        <div class="card card-warm acq-card reveal d3">
+          <div class="acq-num">03</div>
+          <span class="lbl lbl-warm">Transition</span>
+          <div class="acq-t">Hassle-Free</div>
+          <div class="acq-d">We manage everything from deal to future operations — so you can focus on your next project.</div>
+          <a href="https://discord.gg/jwdkxcsDUt" target="_blank" rel="noopener" class="cta cta-warm">Learn more <span>→</span></a>
+        </div>
+      </div>
+
+      <div class="card card-purple acq-cta reveal">
+        <h3>Let's Talk</h3>
+        <p>Have a game worth selling? Reach out to Lil10K on Discord with your game link and stats.</p>
+        <a href="https://discord.gg/jwdkxcsDUt" target="_blank" rel="noopener" class="btn btn-blue">Contact on Discord</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ CONTACT ══════════════ -->
+  <section id="contact" class="sec sec-purple">
+    <div class="wrap">
+      <div class="sh center">
+        <div class="eye reveal">Contact</div>
+        <h2 class="h2 reveal d1">Get In Touch</h2>
+        <p class="sub reveal d2">
+          Join the community, reach out to the founder, or talk acquisitions.<br/>
+          We're active on Discord — come find us.
+        </p>
+      </div>
+
+      <div class="contact-grid">
+
+        <a class="card card-purple ccard ccard-purple reveal d1" href="https://discord.gg/jwdkxcsDUt" target="_blank" rel="noopener">
+          <div class="ccard-icon">
+            <svg viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+          </div>
+          <div>
+            <div class="lbl lbl-purple">Community</div>
+            <div class="ccard-t">Join Our Discord Server</div>
+            <div class="ccard-d">Connect with the 1 MAU Works community, get updates on new games, and be first to hear about upcoming launches.</div>
+          </div>
+          <span class="cta cta-purple">Join the Server <span>→</span></span>
+        </a>
+
+        <div class="card card-blue ccard ccard-blue reveal d2" onclick="copyUsername()" style="cursor:pointer;">
+          <div class="ccard-icon">
+            <svg viewBox="0 0 24 24" fill="white" width="26" height="26"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+          </div>
+          <div>
+            <div class="lbl lbl-blue">Direct Contact</div>
+            <div class="ccard-t">Message the Founder</div>
+            <div class="ccard-d">Open Discord, search for <strong style="color:var(--text);">reallil10k</strong> and send a DM. Click to copy the username.</div>
+          </div>
+          <span class="cta cta-blue" id="copyBtn">Copy Username <span>→</span></span>
+        </div>
+
+        <a class="card ccard ccard-x reveal d3" href="https://x.com/RealLil10k" target="_blank" rel="noopener" style="text-decoration:none;color:inherit;background:linear-gradient(160deg,rgba(15,15,15,.95),rgba(8,8,18,.9) 60%);border-color:rgba(255,255,255,.07);">
+          <div class="ccard-icon" style="background:linear-gradient(135deg,#111,#2a2a2a);">
+            <svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </div>
+          <div>
+            <div class="lbl lbl-blue">Follow on X</div>
+            <div class="ccard-t">@RealLil10k</div>
+            <div class="ccard-d">Follow Lil10K on X for updates, announcements, and behind the scenes on what's being built.</div>
+          </div>
+          <span class="cta cta-blue">Follow on X <span>→</span></span>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="foot">
+      <div class="foot-logo">
+        <img src="https://tr.rbxcdn.com/180DAY-08ad183fd368168dd876996dad8014a8/150/150/Image/Webp/noFilter" alt="logo" />
+        1 MAU <b>Works</b>
+      </div>
+      <div class="foot-copy">© 2026 1 MAU Works. All rights reserved.</div>
+      <div class="foot-links">
+        <a href="https://www.roblox.com/communities/33951057/1-MAU-Works" target="_blank" rel="noopener">Roblox Group</a>
+        <a href="https://discord.gg/jwdkxcsDUt" target="_blank" rel="noopener">Discord</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    'use strict';
+
+    /* Progress bar */
+    window.addEventListener('scroll', () => {
+      document.getElementById('bar').style.width =
+        (window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) + '%';
+    });
+
+    /* Active nav */
+    const SECS = ['home','games','about','acquisitions','contact'];
+    window.addEventListener('scroll', () => {
+      let cur = 'home';
+      SECS.forEach(id => { const el = document.getElementById(id); if (el && window.scrollY >= el.offsetTop - 130) cur = id; });
+      document.querySelectorAll('.nav-links a').forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+    });
+
+    /* Mobile */
+    function toggleMob() {
+      const mob = document.getElementById('mob');
+      const burger = document.getElementById('burger');
+      mob.classList.toggle('open');
+      burger.classList.toggle('open');
+    }
+    function closeMob() {
+      document.getElementById('mob').classList.remove('open');
+      document.getElementById('burger').classList.remove('open');
+    }
+    document.addEventListener('click', e => {
+      const mob = document.getElementById('mob');
+      const burger = document.getElementById('burger');
+      if (mob.classList.contains('open') && !mob.contains(e.target) && !burger.contains(e.target)) closeMob();
+    });
+
+    /* Scroll reveal */
+    const ro = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); ro.unobserve(e.target); } });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+    /* Animated counter */
+    function animCount(el, target, dur = 1500) {
+      if (!el) return;
+      const fmt = n => n >= 1e6 ? (n/1e6).toFixed(1).replace('.0','')+'M' : n >= 1e3 ? (n/1e3).toFixed(1).replace('.0','')+'K' : String(n);
+      const t0 = performance.now();
+      (function tick(now) {
+        const p = Math.min((now - t0) / dur, 1);
+        const e = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+        el.textContent = fmt(Math.round(e * target));
+        if (p < 1) requestAnimationFrame(tick); else el.textContent = fmt(target);
+      })(t0);
+    }
+
+    /* Roblox API */
+    const PLACE_ID = '100560553825714';
+
+    // Fetch via allorigins which wraps the response in { contents: "..." }
+    async function proxyFetch(url) {
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+      const res = await fetch(proxyUrl);
+      if (!res.ok) throw new Error('proxy error ' + res.status);
+      const wrapper = await res.json();
+      return JSON.parse(wrapper.contents);
+    }
+
+    async function fetchStats() {
+      // Clear spinners with dashes while loading
+      const ALL_IDS = ['h-visits','h-playing','h-favs','s-visits','s-playing','s-favs','a-visits','a-playing','a-favs'];
+
+      try {
+        // Step 1: Get universe ID from place ID
+        const universeData = await proxyFetch(`https://apis.roblox.com/universes/v1/places/${PLACE_ID}/universe`);
+        const uid = universeData.universeId;
+        if (!uid) throw new Error('no universeId');
+
+        // Step 2: Get game stats
+        const gameData = await proxyFetch(`https://games.roblox.com/v1/games?universeIds=${uid}`);
+        const g = gameData.data?.[0];
+        if (!g) throw new Error('no game data');
+
+        const visits = g.visits || 0;
+        const favs   = g.favoritedCount || 0;
+        let playing  = g.playing || 0;
+
+        // Step 3: Try to get more accurate playing count from servers list
+        try {
+          const srvData = await proxyFetch(`https://games.roblox.com/v1/games/${uid}/servers/Public?limit=100&sortOrder=Desc`);
+          if (srvData?.data?.length) {
+            playing = srvData.data.reduce((sum, s) => sum + (s.playing ?? s.players ?? 0), 0);
+          }
+        } catch(e) { /* fall back to g.playing */ }
+
+        // Animate all stat elements
+        ['h-visits','s-visits','a-visits'].forEach(id => animCount(document.getElementById(id), visits));
+        ['h-favs',  's-favs',  'a-favs'  ].forEach(id => animCount(document.getElementById(id), favs));
+        ['h-playing','s-playing','a-playing'].forEach(id => animCount(document.getElementById(id), playing));
+
+      } catch(e) {
+        console.warn('[1MAU] fetchStats failed:', e);
+        ALL_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '—'; });
+      }
+    }
+
+    function copyUsername() {
+      navigator.clipboard.writeText('reallil10k').then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.innerHTML = 'Copied! <span>✓</span>';
+        btn.style.color = 'var(--green)';
+        setTimeout(() => {
+          btn.innerHTML = 'Copy Username <span>→</span>';
+          btn.style.color = '';
+        }, 2000);
+      });
+    }
+
+    fetchStats();
+
+    /* ── Parallax background orbs ── */
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      document.querySelectorAll('.bg-orb').forEach((o, i) => {
+        const speed = [0.04, -0.025, 0.06][i] ?? 0.04;
+        o.style.transform = `translateY(${y * speed}px)`;
+      });
+    }, { passive: true });
+
+    /* ── Nav intensifies on scroll ── */
+    const navEl = document.querySelector('nav');
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY > 40;
+      navEl.style.backdropFilter = scrolled ? 'blur(22px) saturate(180%)' : 'blur(14px)';
+      navEl.style.borderBottomColor = scrolled ? 'rgba(255,255,255,.08)' : 'rgba(255,255,255,.04)';
+    }, { passive: true });
+
+    /* ── 3-D tilt on cards ── */
+    document.querySelectorAll('.card').forEach(card => {
+      card.style.willChange = 'transform';
+      card.addEventListener('mousemove', e => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width  - 0.5;
+        const y = (e.clientY - r.top)  / r.height - 0.5;
+        card.style.transition = 'transform .1s, box-shadow .3s, border-color .3s';
+        card.style.transform = `translateY(-6px) rotateX(${(-y*5).toFixed(1)}deg) rotateY(${(x*5).toFixed(1)}deg)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transition = 'transform .65s cubic-bezier(.22,1,.36,1), box-shadow .4s, border-color .3s';
+        card.style.transform = '';
+      });
+    });
+
+    /* ── Hero cards gentle float ── */
+    (() => {
+      const cards = document.querySelectorAll('.hero-card');
+      let t = 0;
+      (function drift() {
+        t += 0.011;
+        cards.forEach((c, i) => { c.style.transform = `translateY(${Math.sin(t + i * 1.3) * 5}px)`; });
+        requestAnimationFrame(drift);
+      })();
+    })();
+
+    /* ── Big stat numbers pop in when visible ── */
+    const bigNums = document.querySelectorAll('.big-n');
+    const numObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        const el = e.target;
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(16px) scale(.95)';
+        setTimeout(() => {
+          el.style.transition = 'opacity .55s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1)';
+          el.style.opacity = '1';
+          el.style.transform = '';
+        }, 60);
+        numObs.unobserve(el);
+      });
+    }, { threshold: 0.4 });
+    bigNums.forEach(el => numObs.observe(el));
+
+    /* ── Section entrance: boost the glow ── */
+    document.querySelectorAll('section').forEach(s => {
+      const sObs = new IntersectionObserver(([e]) => {
+        if (e.isIntersecting) { s.classList.add('in-view'); sObs.disconnect(); }
+      }, { threshold: 0.08 });
+      sObs.observe(s);
+    });
+
+  </script>
+</body>
+</html>
