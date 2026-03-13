@@ -855,50 +855,41 @@
       })(t0);
     }
 
-    /* Roblox API */
+    /* Roblox API — tries multiple CORS proxies in order */
     const PLACE_ID = '100560553825714';
 
-    // Fetch via allorigins which wraps the response in { contents: "..." }
     async function proxyFetch(url) {
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-      const res = await fetch(proxyUrl);
-      if (!res.ok) throw new Error('proxy error ' + res.status);
-      const wrapper = await res.json();
-      return JSON.parse(wrapper.contents);
+      // Try a list of proxies — first one that works wins
+      const proxies = [
+        u => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+        u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+        u => `https://thingproxy.freeboard.io/fetch/${u}`,
+      ];
+      for (const makeUrl of proxies) {
+        try {
+          const r = await fetch(makeUrl(url), { signal: AbortSignal.timeout(5000) });
+          if (r.ok) return await r.json();
+        } catch(e) { /* try next */ }
+      }
+      throw new Error('all proxies failed');
     }
 
     async function fetchStats() {
-      // Clear spinners with dashes while loading
       const ALL_IDS = ['h-visits','h-playing','h-favs','s-visits','s-playing','s-favs','a-visits','a-playing','a-favs'];
-
       try {
-        // Step 1: Get universe ID from place ID
-        const universeData = await proxyFetch(`https://apis.roblox.com/universes/v1/places/${PLACE_ID}/universe`);
-        const uid = universeData.universeId;
-        if (!uid) throw new Error('no universeId');
+        const uid = (await proxyFetch(`https://apis.roblox.com/universes/v1/places/${PLACE_ID}/universe`)).universeId;
+        if (!uid) throw new Error('no uid');
 
-        // Step 2: Get game stats
-        const gameData = await proxyFetch(`https://games.roblox.com/v1/games?universeIds=${uid}`);
-        const g = gameData.data?.[0];
+        const g = (await proxyFetch(`https://games.roblox.com/v1/games?universeIds=${uid}`)).data?.[0];
         if (!g) throw new Error('no game data');
 
-        const visits = g.visits || 0;
-        const favs   = g.favoritedCount || 0;
-        let playing  = g.playing || 0;
+        const visits  = g.visits         || 0;
+        const favs    = g.favoritedCount  || 0;
+        const playing = g.playing         || 0;
 
-        // Step 3: Try to get more accurate playing count from servers list
-        try {
-          const srvData = await proxyFetch(`https://games.roblox.com/v1/games/${uid}/servers/Public?limit=100&sortOrder=Desc`);
-          if (srvData?.data?.length) {
-            playing = srvData.data.reduce((sum, s) => sum + (s.playing ?? s.players ?? 0), 0);
-          }
-        } catch(e) { /* fall back to g.playing */ }
-
-        // Animate all stat elements
         ['h-visits','s-visits','a-visits'].forEach(id => animCount(document.getElementById(id), visits));
-        ['h-favs',  's-favs',  'a-favs'  ].forEach(id => animCount(document.getElementById(id), favs));
+        ['h-favs','s-favs','a-favs'].forEach(id => animCount(document.getElementById(id), favs));
         ['h-playing','s-playing','a-playing'].forEach(id => animCount(document.getElementById(id), playing));
-
       } catch(e) {
         console.warn('[1MAU] fetchStats failed:', e);
         ALL_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '—'; });
