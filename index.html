@@ -855,16 +855,20 @@
       })(t0);
     }
 
-    /* Roblox API — universe ID hardcoded, calls games API directly (no proxy needed) */
+    /* Roblox API via Cloudflare Worker (handles CORS server-side)
+       1. Go to https://dash.cloudflare.com → Workers & Pages → Create Worker
+       2. Paste the code below the closing script tag (in the HTML comment) into the editor
+       3. Deploy → copy the URL → paste it as WORKER_URL below
+    */
     const UNIVERSE_ID = '9544855325';
+    const WORKER_URL  = 'https://roblox-stats.studioobbys.workers.dev';
 
     async function fetchStats() {
       const ALL_IDS = ['h-visits','h-playing','h-favs','s-visits','s-playing','s-favs','a-visits','a-playing','a-favs'];
       try {
-        const res = await fetch(`https://games.roblox.com/v1/games?universeIds=${UNIVERSE_ID}`);
-        if (!res.ok) throw new Error('api ' + res.status);
-        const g = (await res.json()).data?.[0];
-        if (!g) throw new Error('no game data');
+        const res = await fetch(`${WORKER_URL}?universeId=${UNIVERSE_ID}`);
+        if (!res.ok) throw new Error('worker ' + res.status);
+        const g = await res.json();
 
         const visits  = g.visits         || 0;
         const favs    = g.favoritedCount  || 0;
