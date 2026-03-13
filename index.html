@@ -244,7 +244,6 @@
     .lbl-purple { color:var(--purple); }
     .lbl-warm   { color:var(--warm); }
     .lbl-green  { color:var(--green); }
-    .lbl-gray  { color:var(--gray); }
 
     /* ── CTA ARROW ── */
     .cta {
@@ -258,7 +257,6 @@
     .cta-purple { color:var(--purple); }
     .cta-warm   { color:var(--warm); }
     .cta-green  { color:var(--green); }
-    .cta-gray  { color:var(--gray); }
 
     /* ── SECTION HEADER ── */
     .sh { margin-bottom:3.5rem; }
@@ -500,7 +498,43 @@
       .bs-row   { grid-template-columns:1fr; }
       .stat-row { grid-template-columns:repeat(3,1fr); }
     }
-  </style>
+  
+    /* ── TOAST ── */
+    #toast {
+      position:fixed; bottom:2rem; right:2rem; z-index:9999;
+      background:rgba(11,11,22,.96); border:1px solid rgba(255,255,255,.1);
+      backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+      border-radius:14px; padding:1rem 1.25rem;
+      display:flex; align-items:center; gap:.85rem;
+      box-shadow:0 20px 60px rgba(0,0,0,.5);
+      max-width:320px;
+      animation: toastIn .5s .8s cubic-bezier(.22,1,.36,1) both;
+    }
+    @keyframes toastIn {
+      from { opacity:0; transform:translateY(16px) scale(.97); }
+      to   { opacity:1; transform:translateY(0)    scale(1); }
+    }
+    #toast.hide {
+      animation: toastOut .4s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    @keyframes toastOut {
+      to { opacity:0; transform:translateY(12px) scale(.96); }
+    }
+    .toast-icon {
+      flex-shrink:0; width:38px; height:38px; border-radius:10px;
+      background:rgba(99,179,237,.12); border:1px solid rgba(99,179,237,.2);
+      display:flex; align-items:center; justify-content:center;
+    }
+    .toast-body { flex:1; }
+    .toast-title { font-size:.82rem; font-weight:600; color:var(--text); margin-bottom:.18rem; }
+    .toast-sub   { font-size:.74rem; color:var(--muted); line-height:1.5; }
+    .toast-close {
+      flex-shrink:0; background:none; border:none; cursor:pointer;
+      color:var(--muted); font-size:1rem; line-height:1; padding:.2rem;
+      transition:color .2s;
+    }
+    .toast-close:hover { color:var(--text); }
+</style>
 </head>
 <body>
 
@@ -778,11 +812,11 @@
             <svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.91-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
           </div>
           <div>
-            <div class="lbl lbl-gray">X (Twitter)</div>
+            <div class="lbl lbl-blue">Follow on X</div>
             <div class="ccard-t">@RealLil10k</div>
             <div class="ccard-d">Follow Lil10K on X for updates, announcements, and behind the scenes on what's being built.</div>
           </div>
-          <span class="cta cta-gray">Follow on X <span>→</span></span>
+          <span class="cta cta-blue">Follow on X <span>→</span></span>
         </a>
 
       </div>
@@ -969,6 +1003,26 @@
       sObs.observe(s);
     });
 
+  </script>
+
+  <div id="toast">
+    <div class="toast-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    </div>
+    <div class="toast-body">
+      <div class="toast-title">We just launched</div>
+      <div class="toast-sub">1 MAU Works is a new studio. More games are on the way.</div>
+    </div>
+    <button class="toast-close" onclick="dismissToast()" aria-label="Dismiss">✕</button>
+  </div>
+
+  <script>
+    function dismissToast() {
+      const t = document.getElementById('toast');
+      t.classList.add('hide');
+      t.addEventListener('animationend', () => t.remove(), { once: true });
+    }
+    setTimeout(dismissToast, 6000);
   </script>
 </body>
 </html>
