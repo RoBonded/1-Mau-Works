@@ -103,30 +103,20 @@
       transition:transform .35s cubic-bezier(.22,1,.36,1), opacity .25s, width .3s;
       transform-origin:center;
     }
-    /* X state */
     .hamburger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity:0; width:0; }
     .hamburger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg); }
 
     /* ── MOBILE MENU ── */
     .mob {
-      position:fixed;
-      top:72px;
-      left:12px;
-      right:12px;
-      z-index:99;
+      position:fixed; top:72px; left:12px; right:12px; z-index:99;
       background:rgba(8,8,20,.92);
       backdrop-filter:blur(28px) saturate(160%);
       -webkit-backdrop-filter:blur(28px) saturate(160%);
-      border:1px solid rgba(255,255,255,.09);
-      border-radius:20px;
-      display:flex;
-      flex-direction:column;
-      padding:.5rem;
-      pointer-events:none;
-      opacity:0;
-      transform:translateY(-8px) scale(.97);
-      transform-origin:top center;
+      border:1px solid rgba(255,255,255,.09); border-radius:20px;
+      display:flex; flex-direction:column; padding:.5rem;
+      pointer-events:none; opacity:0;
+      transform:translateY(-8px) scale(.97); transform-origin:top center;
       transition:opacity .28s cubic-bezier(.22,1,.36,1), transform .28s cubic-bezier(.22,1,.36,1);
       box-shadow:0 20px 60px rgba(0,0,0,.6);
     }
@@ -146,7 +136,6 @@
     .mob.open a:nth-child(5) { opacity:1; transform:none; transition-delay:.23s; }
     .mob a:first-child { background:rgba(99,179,237,.12); color:var(--accent); }
     .mob a:hover { background:rgba(255,255,255,.05); color:#fff; }
-    .mob-line { display:none; }
 
     /* ── LAYOUT ── */
     .wrap { max-width:1120px; margin:0 auto; padding:0 2rem; position:relative; z-index:1; }
@@ -165,14 +154,12 @@
     .d1{transition-delay:.07s} .d2{transition-delay:.15s}
     .d3{transition-delay:.23s} .d4{transition-delay:.31s}
 
-    /* Cards need 3D context on parent */
     .hero-right, .games-right, .about-right, .acq-grid, .contact-grid { perspective: 900px; }
     .card { transform-style: preserve-3d; }
 
-    /* Section in-view glow intensifies */
     .sec.in-view::before { animation: glowPulse 3s ease-in-out infinite; }
 
-    /* ── SECTION WRAPPER with radial glow top ── */
+    /* ── SECTION WRAPPER ── */
     .sec {
       position:relative; overflow:hidden; padding:7.5rem 0;
       border-top:1px solid var(--border);
@@ -182,31 +169,14 @@
       transition:opacity .3s;
     }
 
-    /* colour variants */
-    .sec-blue {
-      background:linear-gradient(170deg, rgba(99,179,237,.07) 0%, transparent 50%);
-    }
-    .sec-blue::before {
-      background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,179,237,.13), transparent 65%);
-    }
-    .sec-purple {
-      background:linear-gradient(170deg, rgba(88,101,242,.08) 0%, transparent 50%);
-    }
-    .sec-purple::before {
-      background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(88,101,242,.14), transparent 65%);
-    }
-    .sec-warm {
-      background:linear-gradient(170deg, rgba(246,173,85,.06) 0%, transparent 50%);
-    }
-    .sec-warm::before {
-      background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(246,173,85,.1), transparent 65%);
-    }
-    .sec-green {
-      background:linear-gradient(170deg, rgba(104,211,145,.05) 0%, transparent 50%);
-    }
-    .sec-green::before {
-      background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(104,211,145,.1), transparent 65%);
-    }
+    .sec-blue   { background:linear-gradient(170deg, rgba(99,179,237,.07) 0%, transparent 50%); }
+    .sec-blue::before   { background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(99,179,237,.13), transparent 65%); }
+    .sec-purple { background:linear-gradient(170deg, rgba(88,101,242,.08) 0%, transparent 50%); }
+    .sec-purple::before { background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(88,101,242,.14), transparent 65%); }
+    .sec-warm   { background:linear-gradient(170deg, rgba(246,173,85,.06) 0%, transparent 50%); }
+    .sec-warm::before   { background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(246,173,85,.1), transparent 65%); }
+    .sec-green  { background:linear-gradient(170deg, rgba(104,211,145,.05) 0%, transparent 50%); }
+    .sec-green::before  { background:radial-gradient(ellipse 80% 60% at 50% 0%, rgba(104,211,145,.1), transparent 65%); }
 
     /* ── SHARED CARD SYSTEM ── */
     .card {
@@ -292,9 +262,7 @@
 
     /* ── DIVIDER ── */
     .div { border:none; border-top:1px solid var(--border); }
-    /* ══════════════════════════════════════════
-       WTF ur doing here! Discord Bond5699
-    ══════════════════════════════════════════ */
+
     /* ══════════════════════════════════════════
        HERO
     ══════════════════════════════════════════ */
@@ -368,20 +336,35 @@
     .gpa { margin-left:auto; color:var(--accent); }
 
     /* ══════════════════════════════════════════
-       GAMES
+       GAMES — now a vertical stack of full-width rows
     ══════════════════════════════════════════ */
-    .game-layout { display:grid; grid-template-columns:1.35fr 1fr; gap:1.4rem; align-items:start; }
+    .games-list { display:flex; flex-direction:column; gap:2rem; }
+
+    /* Each game row: thumb left, info right */
+    .game-row {
+      display:grid;
+      grid-template-columns: 420px 1fr;
+      gap:0;
+      align-items:stretch;
+    }
 
     .game-thumb {
-      position:relative; width:100%; overflow:hidden;
-      background:var(--card2); border-radius:18px 18px 0 0;
+      position:relative; overflow:hidden;
+      background:var(--card2); border-radius:20px 0 0 20px;
+      flex-shrink:0;
     }
-    .game-thumb img { width:100%; height:auto; display:block; object-fit:contain; transition:transform .6s var(--ease); }
-    .card:hover .game-thumb img { transform:scale(1.03); }
+    .game-thumb img {
+      width:100%; height:100%; min-height:240px;
+      display:block; object-fit:cover;
+      transition:transform .6s var(--ease);
+    }
+    .card:hover .game-thumb img { transform:scale(1.04); }
     .game-thumb-overlay {
       position:absolute; inset:0;
-      background:linear-gradient(to bottom, transparent 40%, rgba(11,11,22,.98) 100%);
+      background:linear-gradient(to right, transparent 55%, rgba(11,11,22,.98) 100%);
     }
+
+    /* Shimmer / spinner for thumb loading */
     .shimmer {
       background:linear-gradient(90deg, var(--card2) 25%, rgba(255,255,255,.035) 50%, var(--card2) 75%);
       background-size:800px 100%; animation:shimmer 1.5s infinite;
@@ -393,11 +376,16 @@
     .badge-l { display:flex; align-items:center; gap:.5rem; font-size:.75rem; font-weight:700; letter-spacing:.06em; color:#fff; background:rgba(104,211,145,.18); border:1.5px solid rgba(104,211,145,.55); padding:.35rem 1rem; border-radius:100px; backdrop-filter:blur(8px); box-shadow:0 0 16px rgba(104,211,145,.25); }
     .badge-ld { width:8px; height:8px; border-radius:50%; background:var(--green); box-shadow:0 0 8px rgba(104,211,145,.9); animation:pulse 1.6s infinite; }
 
-    .game-body { padding:1.6rem; }
-    .game-title { font-family:'Bebas Neue',sans-serif; font-size:1.7rem; letter-spacing:.04em; margin-bottom:.3rem; }
+    /* Thumb placeholder before image loads */
+    .game-thumb.loading { background:var(--card2); }
+    .game-thumb.loading img { opacity:0; }
+    .game-thumb.loaded img { opacity:1; transition:opacity .4s; }
+
+    .game-body { padding:2rem 2rem 2rem 2.2rem; display:flex; flex-direction:column; justify-content:center; }
+    .game-title { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:.04em; margin-bottom:.3rem; }
     .game-by { font-size:.74rem; color:var(--muted); margin-bottom:.8rem; }
     .game-by em { color:var(--accent); font-style:normal; font-weight:500; }
-    .game-desc { font-size:.84rem; color:var(--muted); line-height:1.75; margin-bottom:1.3rem; }
+    .game-desc { font-size:.86rem; color:var(--muted); line-height:1.75; margin-bottom:1.3rem; }
 
     .stat-row { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--border); border-radius:10px; overflow:hidden; margin-bottom:1.3rem; }
     .sr { background:var(--card2); padding:.85rem .5rem; text-align:center; }
@@ -414,7 +402,8 @@
     .play-btn:hover { background:#90cdf4; transform:translateY(-2px); box-shadow:0 10px 30px rgba(99,179,237,.32); }
     .play-icon { width:0; height:0; border-top:5px solid transparent; border-bottom:5px solid transparent; border-left:9px solid var(--bg); }
 
-    .game-side { display:flex; flex-direction:column; gap:1.4rem; }
+    /* "Coming soon" side cards below the game list */
+    .game-extras { display:grid; grid-template-columns:1fr 1fr; gap:1.4rem; margin-top:.5rem; }
     .cs-card { padding:2.2rem 1.9rem; display:flex; flex-direction:column; gap:.75rem; }
 
     /* ══════════════════════════════════════════
@@ -492,7 +481,11 @@
       .hero-grid    { grid-template-columns:1fr; }
       .hero-card    { display:none; }
       .about-layout { grid-template-columns:1fr; gap:3rem; }
-      .game-layout  { grid-template-columns:1fr; }
+      .game-row     { grid-template-columns:1fr; }
+      .game-thumb   { border-radius:20px 20px 0 0; min-height:220px; }
+      .game-thumb img { min-height:220px; }
+      .game-thumb-overlay { background:linear-gradient(to bottom, transparent 40%, rgba(11,11,22,.98) 100%); }
+      .game-extras  { grid-template-columns:1fr; }
       .acq-intro    { grid-template-columns:1fr; gap:2rem; }
       .acq-grid     { grid-template-columns:1fr; }
       .contact-grid { grid-template-columns:1fr; }
@@ -503,7 +496,7 @@
       .bs-row   { grid-template-columns:1fr; }
       .stat-row { grid-template-columns:repeat(3,1fr); }
     }
-  
+
     /* ── TOAST ── */
     #toast {
       position:fixed; bottom:2rem; right:2rem; z-index:9999;
@@ -511,35 +504,19 @@
       backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
       border-radius:14px; padding:1rem 1.25rem;
       display:flex; align-items:center; gap:.85rem;
-      box-shadow:0 20px 60px rgba(0,0,0,.5);
-      max-width:320px;
+      box-shadow:0 20px 60px rgba(0,0,0,.5); max-width:320px;
       animation: toastIn .5s .8s cubic-bezier(.22,1,.36,1) both;
     }
-    @keyframes toastIn {
-      from { opacity:0; transform:translateY(16px) scale(.97); }
-      to   { opacity:1; transform:translateY(0)    scale(1); }
-    }
-    #toast.hide {
-      animation: toastOut .4s cubic-bezier(.22,1,.36,1) forwards;
-    }
-    @keyframes toastOut {
-      to { opacity:0; transform:translateY(12px) scale(.96); }
-    }
-    .toast-icon {
-      flex-shrink:0; width:38px; height:38px; border-radius:10px;
-      background:rgba(99,179,237,.12); border:1px solid rgba(99,179,237,.2);
-      display:flex; align-items:center; justify-content:center;
-    }
+    @keyframes toastIn { from{opacity:0;transform:translateY(16px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+    #toast.hide { animation: toastOut .4s cubic-bezier(.22,1,.36,1) forwards; }
+    @keyframes toastOut { to{opacity:0;transform:translateY(12px) scale(.96)} }
+    .toast-icon { flex-shrink:0; width:38px; height:38px; border-radius:10px; background:rgba(99,179,237,.12); border:1px solid rgba(99,179,237,.2); display:flex; align-items:center; justify-content:center; }
     .toast-body { flex:1; }
     .toast-title { font-size:.82rem; font-weight:600; color:var(--text); margin-bottom:.18rem; }
     .toast-sub   { font-size:.74rem; color:var(--muted); line-height:1.5; }
-    .toast-close {
-      flex-shrink:0; background:none; border:none; cursor:pointer;
-      color:var(--muted); font-size:1rem; line-height:1; padding:.2rem;
-      transition:color .2s;
-    }
+    .toast-close { flex-shrink:0; background:none; border:none; cursor:pointer; color:var(--muted); font-size:1rem; line-height:1; padding:.2rem; transition:color .2s; }
     .toast-close:hover { color:var(--text); }
-</style>
+  </style>
 </head>
 <body>
 
@@ -597,7 +574,7 @@
             <div class="s2"><div class="s2-n" id="h-visits">—</div><div class="s2-l">Total Visits</div></div>
             <div class="s2"><div class="s2-n" id="h-playing">—</div><div class="s2-l">Playing Now</div></div>
             <div class="s2"><div class="s2-n" id="h-favs">—</div><div class="s2-l">Favorites</div></div>
-            <div class="s2"><div class="s2-n">1+</div><div class="s2-l">Games Live</div></div>
+            <div class="s2"><div class="s2-n">2+</div><div class="s2-l">Games Live</div></div>
           </div>
           <a href="https://www.roblox.com/communities/33951057/1-MAU-Works" target="_blank" rel="noopener" class="group-pill">
             <img src="https://tr.rbxcdn.com/180DAY-08ad183fd368168dd876996dad8014a8/150/150/Image/Webp/noFilter" alt="1 MAU Works" />
@@ -622,11 +599,15 @@
         <a href="https://www.roblox.com/communities/33951057/1-MAU-Works#!/about" target="_blank" rel="noopener" class="btn btn-out btn-sm reveal">View on Roblox</a>
       </div>
 
-      <div class="game-layout reveal">
+      <div class="games-list">
 
-        <div class="card card-blue" style="padding:0;">
-          <div class="game-thumb" id="gameThumb">
-            <img src="https://tr.rbxcdn.com/180DAY-7f2f8c37511a5edc3ac366661dccdf00/768/432/Image/Webp/noFilter" alt="Find a Car"/>
+        <!-- ── Game 1: Find a Car ── -->
+        <div class="card card-blue game-row reveal">
+          <div class="game-thumb loading" id="thumb-fac">
+            <div class="thumb-load shimmer" id="loader-fac">
+              <div class="spinner"></div>
+            </div>
+            <img src="" alt="Find a Car" id="img-fac" style="object-position:center;" />
             <div class="game-thumb-overlay"></div>
             <div class="thumb-badges">
               <span class="badge-l"><span class="badge-ld"></span>Live</span>
@@ -635,11 +616,12 @@
           <div class="game-body">
             <div class="lbl lbl-blue">1 MAU Works</div>
             <div class="game-title">Find a Car</div>
+            <div class="game-by">by <em>Lil10K</em></div>
             <div class="game-desc">Hunt down hidden vehicles scattered across the map. A fast-paced discovery game that keeps players coming back for more.</div>
             <div class="stat-row">
-              <div class="sr"><div class="sr-n" id="s-visits"><div class="spinner" style="width:11px;height:11px;margin:auto;"></div></div><div class="sr-l">Visits</div></div>
-              <div class="sr"><div class="sr-n" id="s-playing"><div class="spinner" style="width:11px;height:11px;margin:auto;"></div></div><div class="sr-l">Playing</div></div>
-              <div class="sr"><div class="sr-n" id="s-favs"><div class="spinner" style="width:11px;height:11px;margin:auto;"></div></div><div class="sr-l">Favorites</div></div>
+              <div class="sr"><div class="sr-n" id="s-visits-fac"><div class="spinner" style="width:11px;height:11px;margin:auto;"></div></div><div class="sr-l">Visits</div></div>
+              <div class="sr"><div class="sr-n" id="s-playing-fac"><div class="spinner" style="width:11px;height:11px;margin:auto;"></div></div><div class="sr-l">Playing</div></div>
+              <div class="sr"><div class="sr-n" id="s-favs-fac"><div class="spinner" style="width:11px;height:11px;margin:auto;"></div></div><div class="sr-l">Favorites</div></div>
             </div>
             <a href="https://www.roblox.com/games/100560553825714/Find-a-Car" target="_blank" rel="noopener" class="play-btn">
               <span class="play-icon"></span>Play Now on Roblox
@@ -647,22 +629,52 @@
           </div>
         </div>
 
-        <div class="game-side">
-          <div class="card card-warm cs-card reveal d2">
-            <span class="lbl lbl-warm">In Development</span>
-            <div class="h2" style="font-size:1.6rem;">Next Game In The Works</div>
-            <div class="sub" style="font-size:.83rem;">We're actively building our next Roblox experience. Follow our group to be first to know when it launches.</div>
-            <a href="https://www.roblox.com/communities/33951057/1-MAU-Works" target="_blank" rel="noopener" class="cta cta-warm">Stay tuned <span>→</span></a>
+        <!-- ── Game 2: Socrates Tower ── -->
+        <div class="card card-purple game-row reveal d1">
+          <div class="game-thumb loading" id="thumb-st">
+            <div class="thumb-load shimmer" id="loader-st">
+              <div class="spinner"></div>
+            </div>
+            <img src="" alt="Socrates Tower" id="img-st" style="object-position:center;" />
+            <div class="game-thumb-overlay"></div>
+            <div class="thumb-badges">
+              <span class="badge-l"><span class="badge-ld"></span>Live</span>
+            </div>
           </div>
-          <div class="card card-purple cs-card reveal d3">
-            <span class="lbl lbl-purple">Coming Soon</span>
-            <div class="h2" style="font-size:1.6rem;">More on the Way</div>
-            <div class="sub" style="font-size:.83rem;">New games, new genres, bigger experiences — in the pipeline for 2026.</div>
-            <a href="https://discord.gg/jwdkxcsDUt" target="_blank" rel="noopener" class="cta cta-purple">More in 2026 <span>→</span></a>
+          <div class="game-body">
+            <div class="lbl lbl-purple">1 MAU Works</div>
+            <div class="game-title">Socrates Tower</div>
+            <div class="game-by">by <em>Lil10K</em></div>
+            <div class="game-desc">Climb the legendary Socrates Tower — a challenging vertical experience that tests your skill, patience, and determination floor by floor.</div>
+            <div class="stat-row">
+              <div class="sr"><div class="sr-n" id="s-visits-st"><div class="spinner" style="width:11px;height:11px;margin:auto;"></div></div><div class="sr-l">Visits</div></div>
+              <div class="sr"><div class="sr-n" id="s-playing-st"><div class="spinner" style="width:11px;height:11px;margin:auto;"></div></div><div class="sr-l">Playing</div></div>
+              <div class="sr"><div class="sr-n" id="s-favs-st"><div class="spinner" style="width:11px;height:11px;margin:auto;"></div></div><div class="sr-l">Favorites</div></div>
+            </div>
+            <a href="https://www.roblox.com/games/109116810486031/Socrates-Tower" target="_blank" rel="noopener" class="play-btn" style="background:var(--purple);">
+              <span class="play-icon"></span>Play Now on Roblox
+            </a>
           </div>
         </div>
 
       </div>
+
+      <!-- Coming soon extras -->
+      <div class="game-extras" style="margin-top:1.4rem;">
+        <div class="card card-warm cs-card reveal d2">
+          <span class="lbl lbl-warm">In Development</span>
+          <div class="h2" style="font-size:1.6rem;">Next Game In The Works</div>
+          <div class="sub" style="font-size:.83rem;">We're actively building our next Roblox experience. Follow our group to be first to know when it launches.</div>
+          <a href="https://www.roblox.com/communities/33951057/1-MAU-Works" target="_blank" rel="noopener" class="cta cta-warm">Stay tuned <span>→</span></a>
+        </div>
+        <div class="card card-green cs-card reveal d3">
+          <span class="lbl lbl-green">Coming Soon</span>
+          <div class="h2" style="font-size:1.6rem;">More on the Way</div>
+          <div class="sub" style="font-size:.83rem;">New games, new genres, bigger experiences — in the pipeline for 2026.</div>
+          <a href="https://discord.gg/jwdkxcsDUt" target="_blank" rel="noopener" class="cta cta-green">More in 2026 <span>→</span></a>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -846,13 +858,39 @@
   <script>
     'use strict';
 
-    /* Progress bar */
+    /* ── Config ── */
+    const WORKER_URL = 'https://roblox-stats.studioobbys.workers.dev';
+
+    const GAMES = [
+      {
+        universeId: '9544855325',
+        thumbEl:    'thumb-fac',
+        loaderEl:   'loader-fac',
+        imgEl:      'img-fac',
+        visits:     ['h-visits', 's-visits-fac', 'a-visits'],
+        playing:    ['h-playing','s-playing-fac','a-playing'],
+        favs:       ['h-favs',  's-favs-fac',  'a-favs'],
+      },
+      {
+        universeId: '7638949916', // Socrates Tower universe ID derived from place 109116810486031
+        thumbEl:    'thumb-st',
+        loaderEl:   'loader-st',
+        imgEl:      'img-st',
+        visits:     ['s-visits-st'],
+        playing:    ['s-playing-st'],
+        favs:       ['s-favs-st'],
+        // Socrates Tower stats are separate — not aggregated into hero/about totals
+        separate:   true,
+      },
+    ];
+
+    /* ── Progress bar ── */
     window.addEventListener('scroll', () => {
       document.getElementById('bar').style.width =
         (window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) + '%';
     });
 
-    /* Active nav */
+    /* ── Active nav ── */
     const SECS = ['home','games','about','acquisitions','contact'];
     window.addEventListener('scroll', () => {
       let cur = 'home';
@@ -860,30 +898,27 @@
       document.querySelectorAll('.nav-links a').forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
     });
 
-    /* Mobile */
+    /* ── Mobile ── */
     function toggleMob() {
-      const mob = document.getElementById('mob');
-      const burger = document.getElementById('burger');
-      mob.classList.toggle('open');
-      burger.classList.toggle('open');
+      document.getElementById('mob').classList.toggle('open');
+      document.getElementById('burger').classList.toggle('open');
     }
     function closeMob() {
       document.getElementById('mob').classList.remove('open');
       document.getElementById('burger').classList.remove('open');
     }
     document.addEventListener('click', e => {
-      const mob = document.getElementById('mob');
-      const burger = document.getElementById('burger');
+      const mob = document.getElementById('mob'), burger = document.getElementById('burger');
       if (mob.classList.contains('open') && !mob.contains(e.target) && !burger.contains(e.target)) closeMob();
     });
 
-    /* Scroll reveal */
+    /* ── Scroll reveal ── */
     const ro = new IntersectionObserver(entries => {
       entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); ro.unobserve(e.target); } });
     }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
     document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
 
-    /* Animated counter */
+    /* ── Animated counter ── */
     function animCount(el, target, dur = 1500) {
       if (!el) return;
       const fmt = n => n >= 1e6 ? (n/1e6).toFixed(1).replace('.0','')+'M' : n >= 1e3 ? (n/1e3).toFixed(1).replace('.0','')+'K' : String(n);
@@ -896,56 +931,68 @@
       })(t0);
     }
 
-    /* Roblox API via Cloudflare Worker (handles CORS server-side)
-       1. Go to https://dash.cloudflare.com → Workers & Pages → Create Worker
-       2. Paste the code below the closing script tag (in the HTML comment) into the editor
-       3. Deploy → copy the URL → paste it as WORKER_URL below
-    */
-    const UNIVERSE_ID = '9544855325';
-    const WORKER_URL  = 'https://roblox-stats.studioobbys.workers.dev';
-
-    async function fetchStats() {
-      const ALL_IDS = ['h-visits','h-playing','h-favs','s-visits','s-playing','s-favs','a-visits','a-playing','a-favs'];
+    /* ── Load thumbnail via Worker ── */
+    async function loadThumb(game) {
       try {
-        const res = await fetch(`${WORKER_URL}?universeId=${UNIVERSE_ID}`);
-        if (!res.ok) throw new Error('worker ' + res.status);
-        const g = await res.json();
+        const res = await fetch(`${WORKER_URL}?universeId=${game.universeId}&thumb=1`);
+        if (!res.ok) throw new Error('thumb ' + res.status);
+        const data = await res.json();
+        if (!data.imageUrl) throw new Error('no imageUrl');
 
-        const visits  = g.visits         || 0;
-        const favs    = g.favoritedCount  || 0;
-        const playing = g.playing         || 0;
+        const imgEl    = document.getElementById(game.imgEl);
+        const thumbEl  = document.getElementById(game.thumbEl);
+        const loaderEl = document.getElementById(game.loaderEl);
 
-        ['h-visits','s-visits','a-visits'].forEach(id => animCount(document.getElementById(id), visits));
-        ['h-favs','s-favs','a-favs'].forEach(id => animCount(document.getElementById(id), favs));
-        ['h-playing','s-playing','a-playing'].forEach(id => animCount(document.getElementById(id), playing));
+        imgEl.src = data.imageUrl;
+        imgEl.onload = () => {
+          loaderEl.style.display = 'none';
+          thumbEl.classList.remove('loading');
+          thumbEl.classList.add('loaded');
+        };
+        imgEl.onerror = () => { loaderEl.style.display = 'none'; };
       } catch(e) {
-        console.warn('[1MAU] fetchStats failed:', e);
-        ALL_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '—'; });
+        console.warn('[1MAU] thumb failed for', game.universeId, e);
+        const loaderEl = document.getElementById(game.loaderEl);
+        if (loaderEl) loaderEl.style.display = 'none';
       }
     }
 
+    /* ── Load stats via Worker ── */
+    async function loadStats(game) {
+      const ids = [...(game.visits||[]), ...(game.playing||[]), ...(game.favs||[])];
+      try {
+        const res = await fetch(`${WORKER_URL}?universeId=${game.universeId}`);
+        if (!res.ok) throw new Error('stats ' + res.status);
+        const g = await res.json();
+
+        const visits  = g.visits         || 0;
+        const playing = g.playing        || 0;
+        const favs    = g.favoritedCount || 0;
+
+        game.visits.forEach(id  => animCount(document.getElementById(id), visits));
+        game.playing.forEach(id => animCount(document.getElementById(id), playing));
+        game.favs.forEach(id    => animCount(document.getElementById(id), favs));
+      } catch(e) {
+        console.warn('[1MAU] stats failed for', game.universeId, e);
+        ids.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '—'; });
+      }
+    }
+
+    /* ── Bootstrap ── */
+    GAMES.forEach(game => {
+      loadThumb(game);
+      loadStats(game);
+    });
+
+    /* ── Copy username ── */
     function copyUsername() {
       navigator.clipboard.writeText('reallil10k').then(() => {
         const btn = document.getElementById('copyBtn');
         btn.innerHTML = 'Copied! <span>✓</span>';
         btn.style.color = 'var(--green)';
-        setTimeout(() => {
-          btn.innerHTML = 'Copy Username <span>→</span>';
-          btn.style.color = '';
-        }, 2000);
+        setTimeout(() => { btn.innerHTML = 'Copy Username <span>→</span>'; btn.style.color = ''; }, 2000);
       });
     }
-
-    fetchStats();
-
-    /* ── Parallax background orbs ── */
-    window.addEventListener('scroll', () => {
-      const y = window.scrollY;
-      document.querySelectorAll('.bg-orb').forEach((o, i) => {
-        const speed = [0.04, -0.025, 0.06][i] ?? 0.04;
-        o.style.transform = `translateY(${y * speed}px)`;
-      });
-    }, { passive: true });
 
     /* ── Nav intensifies on scroll ── */
     const navEl = document.querySelector('nav');
@@ -971,7 +1018,7 @@
       });
     });
 
-    /* ── Hero cards gentle float ── */
+    /* ── Hero card float ── */
     (() => {
       const cards = document.querySelectorAll('.hero-card');
       let t = 0;
@@ -982,32 +1029,13 @@
       })();
     })();
 
-    /* ── Big stat numbers pop in when visible ── */
-    const bigNums = document.querySelectorAll('.big-n');
-    const numObs = new IntersectionObserver(entries => {
-      entries.forEach(e => {
-        if (!e.isIntersecting) return;
-        const el = e.target;
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(16px) scale(.95)';
-        setTimeout(() => {
-          el.style.transition = 'opacity .55s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1)';
-          el.style.opacity = '1';
-          el.style.transform = '';
-        }, 60);
-        numObs.unobserve(el);
-      });
-    }, { threshold: 0.4 });
-    bigNums.forEach(el => numObs.observe(el));
-
-    /* ── Section entrance: boost the glow ── */
+    /* ── Section entrance glow ── */
     document.querySelectorAll('section').forEach(s => {
       const sObs = new IntersectionObserver(([e]) => {
         if (e.isIntersecting) { s.classList.add('in-view'); sObs.disconnect(); }
       }, { threshold: 0.08 });
       sObs.observe(s);
     });
-
   </script>
 
   <div id="toast">
