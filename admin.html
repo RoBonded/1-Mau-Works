@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>1 MAU Works — Admin</title>
+<style>
+:root{--bg:#080c16;--panel:#10192d;--panel2:#14213b;--line:#2b3c60;--text:#f4f8ff;--muted:#9fb0cf;--blue:#3976f6;--green:#72d33a;--yellow:#f6ff3b;--danger:#ff6678}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px Arial,sans-serif}button,input{font:inherit}.layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}.side{padding:25px 18px;border-right:1px solid var(--line);background:#0b1221}.brand{font-size:22px;font-weight:800;margin-bottom:35px}.brand span{color:var(--blue)}nav button{display:block;width:100%;padding:12px;border:0;background:none;color:var(--muted);text-align:left;border-radius:10px;cursor:pointer;margin:4px 0}nav button:hover,nav button.active{background:var(--panel2);color:white}.main{padding:30px;max-width:1400px;width:100%;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}.top h1{margin:0}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px}.metric{font-size:30px;font-weight:800;margin-top:8px}.muted{color:var(--muted)}.section{display:none}.section.active{display:block}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.btn{border:0;border-radius:10px;padding:10px 14px;background:var(--blue);color:white;cursor:pointer;font-weight:700}.btn.green{background:var(--green);color:#10132a}.btn.red{background:var(--danger);color:#10132a}.btn.gray{background:var(--panel2)}input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#0b1221;color:white;margin:6px 0 14px}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:12px;border-bottom:1px solid var(--line);text-align:left}.game{display:grid;grid-template-columns:90px 1fr auto;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}.game img{width:90px;height:90px;object-fit:cover;border-radius:12px}.bar{height:9px;background:#223453;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--blue)}#login{max-width:420px;margin:12vh auto;padding:28px}.hidden{display:none}@media(max-width:900px){.layout{grid-template-columns:1fr}.side{border-right:0;border-bottom:1px solid var(--line)}.grid{grid-template-columns:repeat(2,1fr)}.main{padding:18px}}@media(max-width:550px){.grid{grid-template-columns:1fr}.game{grid-template-columns:65px 1fr}.game img{width:65px;height:65px}.game .row{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<div id="login" class="panel">
+  <h1>1 MAU Works</h1><p class="muted">Private Admin</p>
+  <input id="token" type="password" placeholder="Admin token">
+  <button class="btn" onclick="login()">Enter dashboard</button>
+  <p id="loginError" class="muted"></p>
+</div>
+
+<div id="app" class="layout hidden">
+<aside class="side">
+  <div class="brand">1 MAU <span>Works</span></div>
+  <nav>
+    <button class="active" data-section="dashboard">Dashboard</button>
+    <button data-section="analytics">Analytics</button>
+    <button data-section="games">Games</button>
+  </nav>
+  <button class="btn gray" style="margin-top:25px;width:100%" onclick="logout()">Log out</button>
+</aside>
+
+<main class="main">
+  <div class="top"><h1 id="title">Dashboard</h1><button class="btn gray" onclick="loadAll()">Refresh</button></div>
+
+  <section id="dashboard" class="section active">
+    <div class="grid">
+      <div class="card"><span class="muted">Page views</span><div class="metric" id="views">—</div></div>
+      <div class="card"><span class="muted">Unique visitors</span><div class="metric" id="visitors">—</div></div>
+      <div class="card"><span class="muted">Clicks</span><div class="metric" id="clicks">—</div></div>
+      <div class="card"><span class="muted">Live now</span><div class="metric" id="live">—</div></div>
+    </div>
+    <br>
+    <div class="grid">
+      <div class="card"><span class="muted">Sessions</span><div class="metric" id="sessions">—</div></div>
+      <div class="card"><span class="muted">Avg. time</span><div class="metric" id="duration">—</div></div>
+      <div class="card"><span class="muted">Top page</span><div class="metric" style="font-size:20px" id="topPage">—</div></div>
+      <div class="card"><span class="muted">Top click</span><div class="metric" style="font-size:20px" id="topClick">—</div></div>
+    </div>
+  </section>
+
+  <section id="analytics" class="section">
+    <div class="panel"><h2>Traffic</h2><div id="analyticsContent"></div></div>
+  </section>
+
+  <section id="games" class="section">
+    <div class="panel">
+      <div class="top"><h2>Games</h2><button class="btn green" onclick="showAdd()">+ Add Game</button></div>
+      <div id="gameForm" class="hidden">
+        <input id="gameUrl" placeholder="Roblox game URL">
+        <input id="gameButton" value="Play Game" placeholder="Button text">
+        <input id="gameOrder" type="number" value="1" placeholder="Order">
+        <label><input id="gameVisible" type="checkbox" checked> Visible</label>
+        <button class="btn" onclick="addGame()">Fetch & Save Game</button>
+        <button class="btn gray" onclick="hideAdd()">Cancel</button>
+        <p id="gameError" class="muted"></p>
+        <hr style="border-color:var(--line)">
+      </div>
+      <div id="gamesList"></div>
+    </div>
+  </section>
+</main>
+</div>
+
+<script>
+const tokenKey="mau_admin_token";
+let token=sessionStorage.getItem(tokenKey);
+const api=(path,opts={})=>fetch(path,{...opts,headers:{...(opts.headers||{}),"x-admin-token":token,"Content-Type":"application/json"}});
+
+function login(){
+  token=document.getElementById("token").value.trim();
+  sessionStorage.setItem(tokenKey,token);
+  loadAll().catch(()=>{document.getElementById("loginError").textContent="Invalid token or server error.";sessionStorage.removeItem(tokenKey)});
+}
+function logout(){sessionStorage.removeItem(tokenKey);location.reload()}
+function showApp(){document.getElementById("login").classList.add("hidden");document.getElementById("app").classList.remove("hidden")}
+async function loadAll(){
+  const a=await api("/.netlify/functions/admin-analytics"); if(!a.ok) throw new Error("Unauthorized");
+  const data=await a.json(); showApp(); renderAnalytics(data); await loadGames();
+}
+function fmt(ms){const s=Math.round(ms/1000);return s<60?s+"s":Math.floor(s/60)+"m "+s%60+"s"}
+function top(obj){return Object.entries(obj||{}).sort((a,b)=>b[1]-a[1])[0]||["—",0]}
+function renderAnalytics(d){
+  views.textContent=d.pageViews.toLocaleString();visitors.textContent=d.uniqueVisitors.toLocaleString();
+  clicks.textContent=d.clicks.toLocaleString();live.textContent=d.liveVisitors.toLocaleString();
+  sessions.textContent=d.sessions.toLocaleString();duration.textContent=fmt(d.avgDuration);
+  topPage.textContent=top(d.paths)[0];topClick.textContent=top(d.clicksByLabel)[0];
+  const blocks=[["Pages",d.paths],["Clicks",d.clicksByLabel],["Countries",d.countries],["Devices",d.devices],["Referrers",d.referrers]];
+  analyticsContent.innerHTML=blocks.map(([name,obj])=>{
+    const rows=Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,10), max=rows[0]?.[1]||1;
+    return `<h3>${name}</h3>`+rows.map(([k,v])=>`<div style="margin:10px 0"><div class="row"><span>${esc(k||"Direct")}</span><b>${v}</b></div><div class="bar"><i style="width:${v/max*100}%"></i></div></div>`).join("");
+  }).join("<hr style='border-color:var(--line)'>");
+}
+async function loadGames(){
+  const r=await api("/.netlify/functions/games"); const games=await r.json();
+  gamesList.innerHTML=games.map(g=>`<div class="game"><img src="${esc(g.thumbnail)}"><div><b>${esc(g.name)}</b><div class="muted">${Number(g.playing||0).toLocaleString()} playing · ${Number(g.visits||0).toLocaleString()} visits</div><div class="muted">${esc(g.url)}</div></div><div class="row"><button class="btn gray" onclick="toggleGame('${g.id}',${!g.visible})">${g.visible?"Hide":"Show"}</button><button class="btn red" onclick="deleteGame('${g.id}')">Delete</button></div></div>`).join("")||"<p class='muted'>No games yet.</p>";
+}
+function showAdd(){gameForm.classList.remove("hidden")}
+function hideAdd(){gameForm.classList.add("hidden")}
+async function addGame(){
+  gameError.textContent="Loading Roblox data…";
+  const r=await api("/.netlify/functions/games",{method:"POST",body:JSON.stringify({robloxUrl:gameUrl.value,buttonText:gameButton.value,order:Number(gameOrder.value),visible:gameVisible.checked})});
+  const d=await r.json(); if(!r.ok){gameError.textContent=d.error||"Failed";return}
+  gameError.textContent="Saved!"; gameUrl.value=""; await loadGames();
+}
+async function toggleGame(id,visible){
+  await api("/.netlify/functions/games",{method:"PUT",body:JSON.stringify({id,visible})}); await loadGames();
+}
+async function deleteGame(id){
+  if(!confirm("Delete this game?"))return;
+  await api("/.netlify/functions/games",{method:"DELETE",body:JSON.stringify({id})}); await loadGames();
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]))}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));document.getElementById(b.dataset.section).classList.add("active");document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");title.textContent=b.textContent});
+if(token){loadAll().catch(()=>{sessionStorage.removeItem(tokenKey);token=null})}
+</script>
+</body>
+</html>
