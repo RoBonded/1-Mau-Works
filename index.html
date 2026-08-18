@@ -42,7 +42,7 @@
       <div class="logo-wrap reveal"><span class="sticker top">2 games<br>live!</span><span class="sticker bottom">made<br>to play</span><div class="logo-card"><img src="https://tr.rbxcdn.com/180DAY-3aef0badc6b6393f11dac09fd1d7d2bc/150/150/Image/Webp/noFilter" alt="1 MAU Works"><p>Playful ideas. Real worlds.</p></div></div>
     </div></section>
     <section id="games" class="games"><div class="shell"><div class="section-head reveal"><div><p class="eyebrow">Live now</p><h2>Pick a world.<br>Press play.</h2></div><p>Two very different adventures, both ready when you are.</p></div>
-      <div class="game-grid">
+      <div class="game-grid" id="gameGrid">
         <article class="game reveal" data-universe="9544855325"><img class="game-thumb" src="https://tr.rbxcdn.com/180DAY-3aef0badc6b6393f11dac09fd1d7d2bc/768/432/Image/Webp/noFilter" alt="Find a Car game artwork"><span class="pill">● Live game</span><h3>Find a Car</h3><p>Search the map, find hidden rides, and collect every car you can spot.</p><div class="game-stats" aria-label="Find a Car game statistics"><div class="game-stat"><b data-stat="visits">—</b><span>Visits</span></div><div class="game-stat"><b data-stat="playing">—</b><span>Playing</span></div><div class="game-stat"><b data-stat="favoritedCount">—</b><span>Favorites</span></div></div><a class="button" href="https://www.roblox.com/games/100560553825714/Find-a-Car" target="_blank" rel="noopener">Play on Roblox ↗</a></article>
         <article class="game reveal" data-universe="9988996512"><img class="game-thumb" src="https://tr.rbxcdn.com/180DAY-3aef0badc6b6393f11dac09fd1d7d2bc/768/432/Image/Webp/noFilter" alt="Socrates Tower game artwork"><span class="pill">● Live game</span><h3>Socrates Tower</h3><p>Climb high, stay sharp, and see if you have what it takes to reach the top.</p><div class="game-stats" aria-label="Socrates Tower game statistics"><div class="game-stat"><b data-stat="visits">—</b><span>Visits</span></div><div class="game-stat"><b data-stat="playing">—</b><span>Playing</span></div><div class="game-stat"><b data-stat="favoritedCount">—</b><span>Favorites</span></div></div><a class="button" href="https://www.roblox.com/games/109116810486031/Socrates-Tower" target="_blank" rel="noopener">Play on Roblox ↗</a></article>
       </div>
@@ -105,5 +105,106 @@
       } catch (_) { /* Keep the em dash when live stats cannot be reached. */ }
     });
   </script>
+
+  <script src="/analytics.js" defer></script>
+  <script>
+    /*
+      1 MAU Works admin-managed games
+      --------------------------------
+      The existing game cards remain as the fallback.
+      If games have been added from /admin, the API replaces the cards
+      with the same existing .game styling.
+    */
+    (async () => {
+      try {
+        const response = await fetch('/.netlify/functions/games', {
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (!response.ok) return;
+
+        const games = await response.json();
+        const grid = document.getElementById('gameGrid');
+
+        if (!grid || !Array.isArray(games) || games.length === 0) return;
+
+        grid.innerHTML = games.map(game => `
+          <article class="game reveal" data-universe="${escapeHtml(game.universeId || '')}">
+            <img
+              class="game-thumb"
+              src="${escapeHtml(game.thumbnail || '')}"
+              alt="${escapeHtml(game.name || 'Roblox game')} game artwork"
+            >
+
+            <span class="pill">
+              ● ${game.featured ? 'Featured' : 'Live game'}
+            </span>
+
+            <h3>${escapeHtml(game.name || 'Roblox Game')}</h3>
+
+            <p>
+              ${escapeHtml(
+                game.description ||
+                'Play this Roblox experience and see what you can find.'
+              )}
+            </p>
+
+            <div class="game-stats" aria-label="${escapeHtml(game.name || 'Game')} statistics">
+              <div class="game-stat">
+                <b>${formatAdminStat(game.visits)}</b>
+                <span>Visits</span>
+              </div>
+
+              <div class="game-stat">
+                <b>${formatAdminStat(game.playing)}</b>
+                <span>Playing</span>
+              </div>
+
+              <div class="game-stat">
+                <b>${escapeHtml(game.creator || '1 MAU Works')}</b>
+                <span>Creator</span>
+              </div>
+            </div>
+
+            <a
+              class="button"
+              data-analytics="game:${escapeHtml(game.name || 'Roblox Game')}"
+              href="${escapeHtml(game.url || '#')}"
+              target="_blank"
+              rel="noopener"
+            >
+              ${escapeHtml(game.buttonText || 'Play on Roblox')} ↗
+            </a>
+          </article>
+        `).join('');
+
+        // Re-attach the existing reveal observer to the newly generated cards.
+        document.querySelectorAll('#gameGrid .reveal').forEach(el => observer.observe(el));
+
+      } catch (error) {
+        // If the admin API isn't available, the original cards remain visible.
+        console.warn('Admin-managed games unavailable; keeping existing games.', error);
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, character => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        }[character]));
+      }
+
+      function formatAdminStat(value) {
+        const number = Number(value);
+        if (!Number.isFinite(number)) return '—';
+        if (number >= 1000000) return `${(number / 1000000).toFixed(1).replace('.0', '')}M`;
+        if (number >= 1000) return `${(number / 1000).toFixed(1).replace('.0', '')}K`;
+        return String(number);
+      }
+    })();
+  </script>
+
 </body>
 </html>
