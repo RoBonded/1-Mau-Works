@@ -87,12 +87,12 @@ async function loadAll(){
   const data=await a.json(); showApp(); renderAnalytics(data); await loadGames();
 }
 function fmt(ms){const s=Math.round(ms/1000);return s<60?s+"s":Math.floor(s/60)+"m "+s%60+"s"}
-function top(obj){return Object.entries(obj||{}).sort((a,b)=>b[1]-a[1])[0]||["—",0]}
+function topEntry(obj){return Object.entries(obj||{}).sort((a,b)=>b[1]-a[1])[0]||["—",0]}
 function renderAnalytics(d){
   views.textContent=d.pageViews.toLocaleString();visitors.textContent=d.uniqueVisitors.toLocaleString();
   clicks.textContent=d.clicks.toLocaleString();live.textContent=d.liveVisitors.toLocaleString();
   sessions.textContent=d.sessions.toLocaleString();duration.textContent=fmt(d.avgDuration);
-  topPage.textContent=top(d.paths)[0];topClick.textContent=top(d.clicksByLabel)[0];
+  topPage.textContent=topEntry(d.paths)[0];topClick.textContent=topEntry(d.clicksByLabel)[0];
   const blocks=[["Pages",d.paths],["Clicks",d.clicksByLabel],["Countries",d.countries],["Devices",d.devices],["Referrers",d.referrers]];
   analyticsContent.innerHTML=blocks.map(([name,obj])=>{
     const rows=Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,10), max=rows[0]?.[1]||1;
