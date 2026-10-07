@@ -29,6 +29,38 @@
     @keyframes float { 0%,100% { translate:0 0; } 50% { translate:0 -13px; } } @keyframes orbital { 0%,100% { transform:translate3d(0,0,0) scale(1); } 50% { transform:translate3d(-18px,14px,0) scale(1.08); } } @keyframes slide { to { transform:translateX(-50%); } } .reveal { opacity:0; transform:translateY(24px) scale(.98); transition:opacity .65s ease, transform .65s var(--ease); } .reveal.show { opacity:1; transform:none; } .d1 { transition-delay:.08s; } .d2 { transition-delay:.16s; } .d3 { transition-delay:.24s; }
     @media (max-width:760px) { .nav-inner { min-height:64px; } .nav-links { display:none; } .hero { padding:62px 0; } .hero-grid,.about-grid { grid-template-columns:1fr; gap:38px; } .logo-card { width:min(330px,85%); margin:auto; } .sticker.bottom { left:-4px; } section { padding:65px 0; } .section-head,.contact-box,.foot { align-items:start; flex-direction:column; } .game-grid,.acq-grid { grid-template-columns:1fr; } .game { min-height:390px; } .contact-box { padding:30px; } }
     @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; } }
+
+    /* ── Studio live stats (added) ─────────────────────────────────── */
+    .live-stats { position:relative; z-index:5; margin-top:-46px; padding:0 0 2px; }
+    .stats-bar { display:flex; align-items:stretch; padding:16px 10px 15px; border:2px solid var(--ink); border-radius:22px; background:white; box-shadow:6px 6px 0 var(--ink); transition:transform .35s var(--ease), box-shadow .35s var(--ease); }
+    .stats-bar:hover { transform:translateY(-3px); box-shadow:9px 10px 0 var(--ink); }
+    .stat-cell { position:relative; flex:1; min-width:0; padding:3px 26px; text-align:center; }
+    .stat-cell + .stat-cell { border-left:1px dashed var(--line); }
+    .stat-label { display:inline-flex; align-items:center; gap:7px; font-size:.68rem; font-weight:700; letter-spacing:.11em; text-transform:uppercase; color:#555d79; }
+    .stat-value { display:block; margin-top:7px; font-family:Fredoka,sans-serif; font-weight:700; font-size:clamp(1.7rem,3vw,2.45rem); line-height:1; letter-spacing:-.02em; color:var(--blue); font-variant-numeric:tabular-nums; }
+    .stat-value.green { color:#58af26; } .stat-value.ink { color:var(--ink); }
+    .stat-sub { display:block; margin-top:8px; font-size:.73rem; font-weight:600; color:#79809b; }
+    .live-dot { position:relative; flex:none; width:7px; height:7px; border-radius:50%; background:var(--green); }
+    .live-dot::after { content:""; position:absolute; inset:-3px; border:2px solid var(--green); border-radius:50%; opacity:.6; animation:ping 1.7s cubic-bezier(0,0,.2,1) infinite; }
+    .hl { display:inline-block; background-image:linear-gradient(0deg,var(--yellow) 38%,transparent 38%); background-repeat:no-repeat; background-size:0% 100%; transition:background-size .9s var(--ease) .2s; }
+    .show .hl { background-size:100% 100%; }
+    .tick { animation:tickPop .55s var(--ease); }
+    .record-pop { position:absolute; top:-16px; right:14px; z-index:3; padding:6px 11px; border:2px solid var(--ink); border-radius:999px; background:var(--green); color:var(--ink); font-family:Fredoka,sans-serif; font-weight:700; font-size:.68rem; box-shadow:3px 3px 0 var(--ink); transform:rotate(7deg) scale(0); transition:transform .55s var(--ease); }
+    .record-pop.show { transform:rotate(7deg) scale(1); }
+    .stats-bar.flash { animation:flashBar 1s ease; }
+    .confetti { position:absolute; top:45%; left:50%; width:8px; height:8px; border-radius:2px; z-index:3; pointer-events:none; animation:confetti .95s ease-out forwards; }
+    body.dark .stats-bar { background:#14213b; border-color:#32466e; box-shadow:6px 6px 0 #03050a; }
+    body.dark .stats-bar:hover { box-shadow:9px 10px 0 #03050a; }
+    body.dark .stat-value.ink { color:#f4f8ff; }
+    body.dark .stat-label { color:#9fb0d4; } body.dark .stat-sub { color:#8fa0c4; }
+    body.dark .hl { background-image:linear-gradient(0deg,rgba(246,255,59,.3) 40%,transparent 40%); }
+    body.dark .stats-bar.flash { animation-name:flashBarDark; }
+    @keyframes ping { 75%,100% { transform:scale(1.9); opacity:0; } }
+    @keyframes tickPop { 0% { transform:scale(1); } 35% { transform:scale(1.12); } 100% { transform:scale(1); } }
+    @keyframes confetti { to { transform:translate(var(--dx),var(--dy)) rotate(var(--rot)); opacity:0; } }
+    @keyframes flashBar { 0%,100% { background:white; } 30% { background:var(--yellow); } }
+    @keyframes flashBarDark { 0%,100% { background:#14213b; } 30% { background:var(--yellow); } }
+    @media (max-width:760px) { .live-stats { margin-top:-24px; } .stats-bar { flex-direction:column; padding:6px 18px; } .stat-cell { padding:13px 4px; } .stat-cell + .stat-cell { border-left:none; border-top:1px dashed var(--line); } .record-pop { right:2px; top:-14px; } }
   </style>
 </head>
 <body>
@@ -40,6 +72,26 @@
     <section id="home" class="hero"><div class="shell hero-grid">
       <div class="reveal"><p class="eyebrow">Roblox game studio</p><h1>Made to play.<br><span class="blue">Built to</span> <span class="green">grow.</span></h1><p>1 MAU Works makes lively Roblox experiences for curious players. Jump in, explore, and see what you find.</p><div class="actions"><a class="button primary" href="#games">Explore our games ↓</a><a class="button secondary" href="https://discord.gg/jwdkxcsDUt" target="_blank" rel="noopener">Join Discord ↗</a></div></div>
       <div class="logo-wrap reveal"><span class="sticker top">2 games<br>live!</span><span class="sticker bottom">made<br>to play</span><div class="logo-card"><img src="https://tr.rbxcdn.com/180DAY-3aef0badc6b6393f11dac09fd1d7d2bc/150/150/Image/Webp/noFilter" alt="1 MAU Works"><p>Playful ideas. Real worlds.</p></div></div>
+    </div></section>
+    <section class="live-stats" aria-label="Studio live statistics"><div class="shell">
+      <div class="stats-bar reveal" id="statsBar">
+        <div class="stat-cell" id="cell-visits">
+          <span class="stat-label">Total visits</span>
+          <b class="stat-value" id="stat-total-visits">—</b>
+          <span class="stat-sub">across every game</span>
+        </div>
+        <div class="stat-cell" id="cell-ccu">
+          <span class="stat-label"><span class="live-dot" aria-hidden="true"></span>Playing now</span>
+          <b class="stat-value green" id="stat-total-ccu" aria-live="polite">—</b>
+          <span class="stat-sub">players in-game right now</span>
+        </div>
+        <div class="stat-cell" id="cell-peak">
+          <span class="record-pop" id="record-pop" aria-hidden="true">New record!</span>
+          <span class="stat-label">CCU peak</span>
+          <b class="stat-value ink"><span class="hl" id="stat-peak-ccu">—</span></b>
+          <span class="stat-sub" id="stat-peak-holder">all-time record</span>
+        </div>
+      </div>
     </div></section>
     <section id="games" class="games"><div class="shell"><div class="section-head reveal"><div><p class="eyebrow">Live now</p><h2>Pick a world.<br>Press play.</h2></div><p>Two very different adventures, both ready when you are.</p></div>
       <div class="game-grid" id="gameGrid">
@@ -204,6 +256,169 @@
         if (number >= 1000) return `${(number / 1000).toFixed(1).replace('.0', '')}K`;
         return String(number);
       }
+    })();
+  </script>
+
+  <script>
+    /* ── Studio live totals (added) ─────────────────────────────────────
+       Total visits + total CCU across all games, plus the all-time CCU
+       peak of the best game. The peak is seeded at 1997, saved in
+       localStorage, and only ever goes up: whenever any game's live CCU
+       beats the record, it updates automatically and celebrates.          */
+    (() => {
+      const UNIVERSES = [
+        { id: '10630513390', name: '+1 Jetpack Keyboard Escape' },
+        { id: '9544855325',  name: 'Find a Car' },
+        { id: '9988996512',  name: 'Socrates Tower' }
+      ];
+      const SEED_PEAK = 1997;
+      const REFRESH_MS = 60000;
+      const worker = 'https://roblox-stats.studioobbys.workers.dev/';
+
+      const bar      = document.getElementById('statsBar');
+      const cellPeak = document.getElementById('cell-peak');
+      const visitsEl = document.getElementById('stat-total-visits');
+      const ccuEl    = document.getElementById('stat-total-ccu');
+      const peakEl   = document.getElementById('stat-peak-ccu');
+      const holderEl = document.getElementById('stat-peak-holder');
+      const popEl    = document.getElementById('record-pop');
+      if (!bar || !visitsEl || !ccuEl || !peakEl) return;
+
+      const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const fmtCompact = v => v >= 1e6 ? `${(v / 1e6).toFixed(1).replace('.0','')}M` : v >= 1e3 ? `${(v / 1e3).toFixed(1).replace('.0','')}K` : String(Math.round(v));
+      const fmtExact = v => Math.round(v).toLocaleString('en-US');
+
+      function countUp(el, value, fmt) {
+        if (reduceMotion) { el.textContent = fmt(value); return; }
+        const start = performance.now(), duration = 950;
+        const tick = now => {
+          const p = Math.min((now - start) / duration, 1);
+          el.textContent = fmt(Math.round(value * (1 - Math.pow(1 - p, 3))));
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }
+
+      function glideTo(el, from, to, fmt, pulse) {
+        if (from == null) return countUp(el, to, fmt);
+        el.textContent = fmt(to);
+        if (to === from || reduceMotion) return;
+        if (pulse) { el.classList.remove('tick'); void el.offsetWidth; el.classList.add('tick'); }
+        const start = performance.now(), duration = 550;
+        const step = now => {
+          const p = Math.min((now - start) / duration, 1);
+          el.textContent = fmt(Math.round(from + (to - from) * (1 - Math.pow(1 - p, 3))));
+          if (p < 1) requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+      }
+
+      function whenShown(el) {
+        if (!('IntersectionObserver' in window)) return Promise.resolve();
+        return new Promise(resolve => {
+          const io = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting) { io.disconnect(); resolve(); }
+          }, { threshold:.3 });
+          io.observe(el);
+        });
+      }
+
+      // Peak record — starts at the 1997 seed and only ever goes up.
+      let peak = { value: SEED_PEAK, holder: 'all-time record' };
+      try {
+        const saved = JSON.parse(localStorage.getItem('mau-peak-ccu') || 'null');
+        if (saved && Number.isFinite(saved.value) && saved.value > peak.value) {
+          peak = { value: saved.value, holder: saved.holder || peak.holder };
+        }
+      } catch (_) {}
+      const savePeak = () => { try { localStorage.setItem('mau-peak-ccu', JSON.stringify(peak)); } catch (_) {} };
+
+      holderEl.textContent = peak.holder === 'all-time record' ? 'all-time record' : `record by ${peak.holder}`;
+
+      async function fetchTotals() {
+        const results = await Promise.allSettled(UNIVERSES.map(u =>
+          fetch(`${worker}?universeId=${u.id}`).then(r => {
+            if (!r.ok) throw new Error('bad response');
+            return r.json();
+          })
+        ));
+        if (!results.some(r => r.status === 'fulfilled')) return null;
+        let visits = 0, ccu = 0;
+        let best = { playing: -1, name: null };
+        results.forEach((result, i) => {
+          if (result.status !== 'fulfilled') return;
+          const s = result.value || {};
+          visits += Number(s.visits) || 0;
+          const playing = Number(s.playing) || 0;
+          ccu += playing;
+          if (playing > best.playing) best = { playing, name: UNIVERSES[i].name };
+        });
+        return { visits, ccu, best };
+      }
+
+      function burstConfetti(cell) {
+        const colors = ['#f6ff3b', '#72d33a', '#3976f6', '#10132a'];
+        for (let i = 0; i < 16; i++) {
+          const bit = document.createElement('span');
+          bit.className = 'confetti';
+          const angle = (Math.PI * 2 * i) / 16 + Math.random() * .5;
+          const dist = 50 + Math.random() * 55;
+          bit.style.setProperty('--dx', `${Math.cos(angle) * dist}px`);
+          bit.style.setProperty('--dy', `${Math.sin(angle) * dist - 24}px`);
+          bit.style.setProperty('--rot', `${Math.round(Math.random() * 520 - 260)}deg`);
+          bit.style.background = colors[i % colors.length];
+          if (Math.random() > .5) bit.style.borderRadius = '50%';
+          bit.style.animationDelay = `${(Math.random() * .08).toFixed(2)}s`;
+          bit.addEventListener('animationend', () => bit.remove());
+          cell.appendChild(bit);
+        }
+      }
+
+      let peakDisplayed = false, popTimer;
+      function celebrate(previous) {
+        holderEl.textContent = `record by ${peak.holder}`;
+        if (!peakDisplayed) { peakDisplayed = true; countUp(peakEl, peak.value, fmtExact); }
+        else glideTo(peakEl, previous, peak.value, fmtExact, true);
+        popEl.classList.add('show');
+        if (!reduceMotion) {
+          bar.classList.remove('flash'); void bar.offsetWidth; bar.classList.add('flash');
+          burstConfetti(cellPeak);
+        }
+        clearTimeout(popTimer);
+        popTimer = setTimeout(() => popEl.classList.remove('show'), 4500);
+      }
+
+      const shown = whenShown(bar);
+      shown.then(() => {
+        if (!peakDisplayed) { peakDisplayed = true; countUp(peakEl, peak.value, fmtExact); }
+      });
+
+      let totals = { visits: null, ccu: null };
+      let inFlight = false;
+
+      async function refresh(first) {
+        if (inFlight) return;
+        inFlight = true;
+        try {
+          const data = await fetchTotals();
+          if (!data) return; // keep the em dashes if the Worker is unreachable
+          if (first) await shown;
+          glideTo(visitsEl, totals.visits, data.visits, fmtCompact, false);
+          glideTo(ccuEl, totals.ccu, data.ccu, fmtExact, !first);
+          totals = { visits: data.visits, ccu: data.ccu };
+          if (data.best.playing > peak.value) {
+            const previous = peak.value;
+            peak = { value: data.best.playing, holder: data.best.name };
+            savePeak();
+            celebrate(previous);
+          }
+        } finally {
+          inFlight = false;
+        }
+      }
+
+      refresh(true);
+      setInterval(() => refresh(false), REFRESH_MS);
     })();
   </script>
 
